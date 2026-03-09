@@ -24,7 +24,7 @@ Das Backend ruft das LLM auf. Das Frontend zeigt den Chat an.
 Beides baut ihr heute selbst – mit KI als Entwicklungspartner.
 
 **Für Tag 2 wichtig:** In Tag 2 wird das Backend so erweitert,
-dass der Chatbot Oracle-Datenbankfragen beantworten kann.
+dass der Chatbot PostgreSQL-Datenbankfragen beantworten kann.
 
 ---
 
@@ -350,7 +350,7 @@ Request: { "message": "...", "history": [...] }
 Response: { "reply": "...", "model": "..." }
 ```
 
-In Tag 2 wird das Backend erweitert: Der Chatbot bekommt Zugriff auf Oracle
+In Tag 2 wird das Backend erweitert: Der Chatbot bekommt Zugriff auf PostgreSQL
 und kann Datenbankfragen mit echten Daten beantworten.
 
 ---

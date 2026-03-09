@@ -221,6 +221,7 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 3 einer KI-Schulu
 ### Folie 27: Ausblick — Wie geht es weiter?
 - RAG: Chatbot mit Unternehmenswissen (Confluence, Wikis)
 - n8n + KI: Workflow-Automatisierung (Ticket → Analyse → Branch → Tests)
+- Vibe Kanban: Kanban-Board für KI-Agents — Tasks zuweisen, parallel ausführen, Diffs reviewen (`npx vibe-kanban`)
 - Maturity-Levels: Von "KI schlägt vor" zu "KI arbeitet autonom"
 
 ### Folie 28: Automatisierungs-Reifegrad (NEU)
@@ -236,7 +237,7 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 3 einer KI-Schulu
 - Tag 1: Greenfield — Von der Idee zur App mit KI
   - LLM-Grundlagen, KERNEL-Framework, Chatbot gebaut
 - Tag 2: Coding Assistant + MCP
-  - Kontext-Hierarchie, MCP-Server für Oracle DB, Security
+  - Kontext-Hierarchie, MCP-Server für PostgreSQL, Security
 - Tag 3: Code-Modernisierung
   - Business Case, COBOL → Java, Swarm & Ralph
 - "Ihr habt jetzt die Werkzeuge — nutzt sie!"

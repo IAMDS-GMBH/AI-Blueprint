@@ -19,7 +19,7 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
   - Text: Dunkelgrau (#212121)
 - Sprache: Deutsch
 
-## Folienstruktur (33 Folien)
+## Folienstruktur (39 Folien)
 
 ### TEIL 1: KI als Coding Assistant (Folien 1-14)
 
@@ -34,7 +34,7 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
   - 10:30-11:00 — Live-Demo: Kontext-Hierarchie
   - 11:00-12:00 — Theorie: MCP-Protokoll
   - 12:00-12:45 — Mittagspause
-  - 12:45-15:15 — Hands-on: MCP-Server für Oracle DB
+  - 12:45-15:15 — Hands-on: MCP-Server für PostgreSQL
 
 ### Folie 3: Das Problem — KI ohne Kontext
 - Zwei Boxen:
@@ -128,7 +128,48 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
 - Titel: "MCP — KI mit der Außenwelt verbinden"
 - Untertitel: "Model Context Protocol"
 
-### Folie 16: Warum MCP besser ist als REST für KI (technisch)
+### Folie 16: Was ist MCP? — Die USB-Analogie
+- Zwei Vergleichsboxen:
+  - VOR USB: Jedes Gerät = eigener Anschluss (Drucker, Scanner, Kamera)
+  - VOR MCP: Jedes Tool = eigene Integration (DB, Browser, GitHub)
+- Pfeil zu:
+  - MIT USB: Ein Standard → jedes Gerät funktioniert überall
+  - MIT MCP: Ein Protokoll → jeder MCP-Server funktioniert in jedem Client
+- MCP-Clients: Claude Code, Copilot, Cursor, Windsurf, Claude Desktop
+- Kernaussage: "MCP = offener Standard von Anthropic, basiert auf JSON-RPC 2.0"
+
+### Folie 17: MCP auf Protokoll-Ebene (JSON-RPC 2.0)
+- Zwei JSON-Blöcke nebeneinander:
+  - Links (Request): `{ "method": "tools/list" }` → Server antwortet mit Tool-Definitionen
+  - Rechts (Tool-Call): `{ "method": "tools/call", "params": { "name": "query-table", "arguments": {...} } }`
+- Kernaussage: "Einfaches Request/Response über JSON — kein komplexes Framework"
+
+### Folie 18: Transport — stdio vs. HTTP
+- Zwei Spalten:
+  - **stdio (lokal):** Server als Child-Process, Kommunikation über stdin/stdout, kein Netzwerk, stoppt mit Client
+  - **HTTP + SSE (remote):** Server als Web-Service, mehrere Clients gleichzeitig, Server-Sent Events für Streaming
+- Entscheidung: "Lokaler MCP-Server → stdio. Shared Team-Server → HTTP"
+- Box: "Wir nutzen heute stdio — einfacher, sicherer"
+
+### Folie 19: Der MCP-Lifecycle (4 Phasen)
+- Sequenz-Diagramm (vertikal):
+  1. **INITIALIZE:** Client startet Server → Server meldet Capabilities
+  2. **DISCOVERY:** Client fragt `tools/list` → Server liefert alle Tools mit Schemas
+  3. **OPERATION:** Client ruft `tools/call` → Server führt aus → Ergebnis zurück (wiederholbar)
+  4. **SHUTDOWN:** Client beendet Verbindung → Server stoppt
+
+### Folie 20: MCP-Server bauen — 15 Zeilen TypeScript
+- Code-Block: Minimaler MCP-Server mit `@modelcontextprotocol/sdk`
+  ```
+  const server = new McpServer({ name: "demo", version: "1.0.0" });
+  server.tool("greet", "Begrüßt einen User", { name: z.string() },
+    async ({ name }) => ({ content: [{ type: "text", text: `Hallo ${name}!` }] })
+  );
+  await server.connect(new StdioServerTransport());
+  ```
+- Kernaussage: "Das ist ein vollständiger MCP-Server. Sofort nutzbar in Claude Code oder Copilot."
+
+### Folie 21: Warum MCP besser ist als REST für KI (technisch)
 - Vergleichstabelle:
   | Aspekt | REST + Tool Use | MCP |
   | Tool-Discovery | Manuell in JSON definieren | Server liefert automatisch |
@@ -138,7 +179,7 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
   | Multi-Client | Pro Client neu integrieren | Einmal bauen → überall nutzen |
 - Kernaussage: "REST geht auch (Tool Use API). MCP ist der Standard dafür."
 
-### Folie 17: Wie ein MCP-Tool-Call technisch abläuft
+### Folie 22: Wie ein MCP-Tool-Call technisch abläuft
 - Sequenz-Diagramm (5 Schritte):
   1. Claude Code startet MCP-Server als Child-Process (stdio)
   2. Server schickt Tool-Liste (name, description, inputSchema)
@@ -147,25 +188,25 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
   5. Server antwortet → Claude formuliert Antwort
 - Box: "Die description ist ein Prompt an die KI — schlechte Description = falsches Tool"
 
-### Folie 18: Tool-Descriptions — Schlecht vs. Gut
+### Folie 23: Tool-Descriptions — Schlecht vs. Gut
 - Zwei Code-Blöcke:
   - ❌ Schlecht: `{ name: "get-data", description: "Holt Daten aus der DB" }` — zu vage
   - ✅ Gut: `{ name: "list-tables", description: "Listet alle Tabellennamen auf. Nutze als ERSTEN Schritt um verfügbare Daten zu verstehen." }`
 - Token-Kosten-Box: "4 Tools × 200 Tokens = 800 Tokens pro Nachricht nur für Definitionen"
 
-### Folie 19: Anatomie eines MCP-Servers
+### Folie 24: Anatomie eines MCP-Servers
 - 3-Spalten-Grafik:
   - Tools (Aktionen): Was KI tun kann (z.B. get-user, execute-query)
   - Resources (Daten): Was KI lesen kann (z.B. db://schema)
   - Prompts (Vorlagen): Vorgefertigte Templates
 
-### Folie 19: MCP-Konfiguration
+### Folie 25: MCP-Konfiguration
 - Zwei Code-Blöcke nebeneinander:
   - Claude Code (.mcp.json): mcpServers → command, args, env
   - Copilot (.vscode/mcp.json): servers → type, command, args
 - "Danach kann KI sagen: 'Ich nutze jetzt get-user aus dem MCP-Server...'"
 
-### Folie 20: MCP + Datenbank
+### Folie 26: MCP + Datenbank
 - Workflow-Diagramm (4 Schritte):
   1. KI liest Schema via Resource
   2. KI analysiert Tabellen + Beziehungen
@@ -173,13 +214,13 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
   4. KI interpretiert und antwortet
 - Kernaussage: "KI führt Queries selbst aus, nicht nur Vorschläge"
 
-### Folie 21: Authentifizierung — 3 Ebenen
+### Folie 27: Authentifizierung — 3 Ebenen
 - Schichten-Diagramm (gestapelt):
   - Ebene 1: Transport-Security (API-Key im Header)
   - Ebene 2: DB-Berechtigungen (Read-Only User)
   - Ebene 3: Tool-Level Authorization (Admin-Only für delete)
 
-### Folie 22: SQL-Injection im MCP-Kontext (Code-Beispiel)
+### Folie 28: SQL-Injection im MCP-Kontext (Code-Beispiel)
 - Zwei Code-Blöcke:
   - ❌ UNSICHER: `SELECT * FROM ${tableName} WHERE ${whereClause}` — KI könnte `1=1; DROP TABLE` generieren
   - ✅ SICHER: Tabellen-Whitelist + Parameterized Queries + Regex-Validierung für WHERE
@@ -190,7 +231,7 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
   - Rate Limiting: Max. 10 Tool-Calls/Minute
   - Logging: Tool-Calls loggen, KEINE Query-Parameter (Datenschutz)
 
-### Folie 23: Security-Checklist für KI im Unternehmen (NEU)
+### Folie 29: Security-Checklist für KI im Unternehmen
 - 8-Punkte-Checklist:
   - Datenklassifizierung: Welche Daten dürfen an welche KI?
   - Anbieter-Compliance: DSGVO, SOC2, ISO 27001?
@@ -202,11 +243,11 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
   - Penetration Testing: Regelmäßig mit KI-Support
 - Risiko-Matrix als kleine Tabelle
 
-### Folie 24: Playwright MCP — Live-Demo
+### Folie 30: Playwright MCP — Live-Demo
 - Was es kann: Selbstheilende Tests, Accessibility-Snapshots (kein Screenshot nötig)
 - Vergleich: Klassisch (KI schreibt → du testest → Fehler → KI fixt) vs. MCP (KI schreibt → testet selbst → fixt direkt)
 
-### Folie 25: Wann MCP einsetzen?
+### Folie 31: Wann MCP einsetzen?
 - Entscheidungstabelle:
   | Situation | Empfehlung |
   | DB-Schema verstehen | MCP |
@@ -214,39 +255,39 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
   | Einmalige API-Abfrage | Direkt via URL |
   | Team nutzt gleichen Datenzugriff | MCP (einmal bauen, alle nutzen) |
 
-### Folie 26: Übersicht Hands-on Aufgabe
+### Folie 32: Übersicht Hands-on Aufgabe
 - Architektur-Diagramm:
-  Vue.js Frontend ↔ Spring Boot Backend ↔ Claude API (mit Tool Use) ↔ MCP Server (TypeScript) ↔ Oracle Database
+  Vue.js Frontend ↔ Spring Boot Backend ↔ Claude API (mit Tool Use) ↔ MCP Server (TypeScript) ↔ PostgreSQL
 - "Wir erweitern den Chatbot von Tag 1!"
 
-### Folie 27: Schritt 1 — Starter verstehen (15 Min)
+### Folie 33: Schritt 1 — Starter verstehen (15 Min)
 - Dateien: server.ts, db-connector.ts, auth-middleware.ts
 - Aufgabe: MCP-Struktur erklären lassen
 
-### Folie 28: Schritt 2 — Oracle DB Connector (30 Min)
-- PostgreSQL → Oracle umbauen (oracledb Package)
-- .env mit Oracle-Credentials füllen
+### Folie 34: Schritt 2 — PostgreSQL DB Connector (30 Min)
+- PostgreSQL-Verbindung mit pg Package aufbauen
+- .env mit PostgreSQL-Credentials füllen
 
-### Folie 29: Schritt 3 — MCP Tools bauen (50 Min)
+### Folie 35: Schritt 3 — MCP Tools bauen (50 Min)
 - 4 Tools implementieren:
   1. list-tables — Alle Tabellen auflisten
   2. describe-table — Spalten + Typen einer Tabelle
   3. query-table — SELECT mit Parametern
   4. count-rows — Anzahl Zeilen einer Tabelle
 
-### Folie 30: Schritt 4 — API-Key Auth (20 Min)
+### Folie 36: Schritt 4 — API-Key Auth (20 Min)
 - Security-Layer mit x-api-key Header
 - Parameterized Queries, Table Whitelist
 
-### Folie 31: Schritt 5 — Claude Code anbinden (20 Min)
+### Folie 37: Schritt 5 — Claude Code anbinden (20 Min)
 - .mcp.json konfigurieren
 - KI testet den MCP-Server direkt
 
-### Folie 32: Schritt 6 — Backend Tool Use (30 Min)
+### Folie 38: Schritt 6 — Backend Tool Use (30 Min)
 - Spring Boot erweitern: Claude API mit tool_use Blocks
 - Chatbot beantwortet jetzt echte DB-Fragen!
 
-### Folie 33: Zusammenfassung Tag 2
+### Folie 39: Zusammenfassung Tag 2
 - Key Takeaways:
   1. Kontext-Hierarchie: CLAUDE.md → Rules → Skills → Prompt
   2. lessons.md = Team-Gedächtnis gegen wiederkehrende Fehler

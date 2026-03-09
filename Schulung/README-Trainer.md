@@ -47,8 +47,7 @@ Hands-on:    3h 30min gesamt
 - [ ] Git installiert
 
 ### Tag 2 zusätzlich:
-- [ ] **Oracle DB Zugang** (Host, Port, Service-Name, User, Password – vom Trainer)
-- [ ] Oracle Instant Client auf den Teilnehmer-Rechnern (für `oracledb` npm Package)
+- [ ] **PostgreSQL DB Zugang** (Host, Port, Datenbankname, User, Password – vom Trainer)
 
 ### Tag 1 + 2 alternativ (kein API-Key vorhanden):
 - [ ] **Ollama installiert** (`brew install ollama`) + Modell geladen (`ollama pull llama3.2`)
@@ -57,8 +56,8 @@ Hands-on:    3h 30min gesamt
 ### Trainer benötigt zusätzlich:
 - [ ] Projektor-Setup (Terminal + IDE gleichzeitig sichtbar)
 - [ ] Dieses Repository geclont und lokal verfügbar
-- [ ] Oracle DB mit Beispieldaten für Tag 2
-- [ ] `db-setup.sql` für Oracle (falls Tag 1 Chatbot nicht fertig)
+- [ ] PostgreSQL DB mit Beispieldaten für Tag 2
+- [ ] `db-setup.sql` für PostgreSQL (falls Tag 1 Chatbot nicht fertig)
 
 ### API-Keys vorbereiten:
 ```bash
@@ -150,7 +149,7 @@ ls .claude/   # → agents/ commands/ rules/ skills/ vorhanden?
 |-----|-------|-------|
 | Tag 1 | Greenfield, CLAUDE.md, KERNEL, Plan Mode | KI-Chatbot (Spring Boot Backend + Vue.js Frontend) |
 | Tag 2 (VM) | KI als Coding Assistant, Kontext-Hierarchie | Coding mit dev-setup-template, lessons.md |
-| Tag 2 (NM) | MCP-Server bauen | Oracle MCP + Chatbot aus Tag 1 verbinden |
+| Tag 2 (NM) | MCP-Server bauen | PostgreSQL MCP + Chatbot aus Tag 1 verbinden |
 | Tag 3 (VM) | COBOL-Analyse mit KI | Synthetische Beispiele (payroll + inventory) |
 | Tag 3 (NM) | COBOL-Migration zu Java | Eigenes COBOL-Modul des Unternehmens |
 
@@ -191,40 +190,37 @@ ls .claude/   # → agents/ commands/ rules/ skills/ vorhanden?
 
 ---
 
-## Tag 2: Coding Assistant + Oracle MCP – Trainer-Hinweise
+## Tag 2: Coding Assistant + PostgreSQL MCP – Trainer-Hinweise
 
 ### Zeitplan Tag 2
 ```
 09:00–09:15  Warm-up + Recap Tag 1 (Chatbot zeigen)
 09:15–10:45  Theorie: Coding Assistant + MCP
 10:45–11:00  Pause
-11:00–12:00  Hands-on Start (Starter-Code verstehen + Oracle-Connector)
+11:00–12:00  Hands-on Start (Starter-Code verstehen + PostgreSQL-Connector)
 12:00–12:45  Mittagspause
 12:45–15:15  Hands-on weiter (MCP-Tools + Auth + Chatbot erweitern)
-15:15–15:45  Demo: Chatbot beantwortet Oracle-Fragen live
+15:15–15:45  Demo: Chatbot beantwortet PostgreSQL-Fragen live
 ```
 
 ### Theorie Tag 2 (09:15–10:45)
 - 30 Min: KI ohne Kontext vs. mit CLAUDE.md (live vergleichen ohne Setup)
 - 30 Min: Was ist MCP, wie funktioniert es, wofür nutzen wir es
-- 30 Min: Live-Demo Playwright MCP + Oracle-Konzept erklären
+- 30 Min: Live-Demo Playwright MCP + PostgreSQL-Konzept erklären
 
-### Oracle-DB Vorbereitung vor Hands-on
+### PostgreSQL-DB Vorbereitung vor Hands-on
 ```bash
 # Verbindung prüfen
-sqlplus schulung_user/schulung_pass@//localhost:1521/SCHULUNGDB
+psql -h localhost -p 5432 -U schulung_user -d schulungdb
 
 # Beispieldaten einspielen falls nötig
-# (Trainer: Oracle-equivalent von db-setup.sql bereitstellen)
+# (Trainer: db-setup.sql bereitstellen)
 ```
-
-**WICHTIG:** Oracle Instant Client muss auf allen Teilnehmer-Rechnern installiert sein.
-Ohne das läuft `oracledb` npm Package nicht.
 
 ### Starter-Code
 - `Tag-2-Coding-Assistant-MCP/mcp-starter/` – TypeScript-Vorlage
-- Aktuell: PostgreSQL-Connector → Teams migrieren auf Oracle (das ist die Übung!)
-- **Häufiges Problem:** `oracledb` Installation schlägt fehl → Instant Client Pfad prüfen
+- Aufgabe: PostgreSQL-Connector implementieren (das ist die Übung!)
+- **Häufiges Problem:** `pg` Verbindung schlägt fehl → Host/Port/Credentials prüfen
 
 ---
 
@@ -268,7 +264,7 @@ Ohne das läuft `oracledb` npm Package nicht.
 | setup.sh läuft nicht | `chmod +x dev-setup-template/setup.sh` oder direkt `bash setup.sh` |
 | ANTHROPIC_API_KEY nicht gesetzt | `export ANTHROPIC_API_KEY=sk-ant-...` im Terminal |
 | CORS-Fehler Frontend→Backend | `WebMvcConfig` mit `localhost:5173` allowedOrigins prüfen |
-| oracledb Installation schlägt fehl | Oracle Instant Client Pfad in `.npmrc` oder ENV setzen |
+| pg Verbindung schlägt fehl | PostgreSQL Host/Port/Credentials in `.env` prüfen |
 | MCP-Server antwortet nicht | `.mcp.json` prüfen, Port-Konflikte, Server-Logs |
 | COBOL-Migration hat Logikfehler | Chain-of-Verification + BigDecimal erzwingen |
 | KI generiert nicht-kompilierenden Code | "Kompiliere und repariere jeden Fehler" als Follow-up |
@@ -288,7 +284,7 @@ Schulung/
   Tag-2-Coding-Assistant-MCP/
     01-Theorie-Coding-Assistant.md
     01-Theorie-MCP.md
-    02-Aufgabe-MCP-Server.md            ← Oracle MCP + Chatbot verbinden
+    02-Aufgabe-MCP-Server.md            ← PostgreSQL MCP + Chatbot verbinden
     mcp-starter/                        ← TypeScript Starter-Code
   Tag-3-Migration/
     01-Theorie.md

@@ -46,21 +46,159 @@ KI *kann* REST-APIs nutzen (über Tool Use / Function Calling). Aber MCP löst P
 
 **MCP = Model Context Protocol**
 
-Ein offener Standard (von Anthropic) der KI-Modellen ermöglicht,
-mit externen Tools und Systemen zu interagieren – auf eine Art die KI versteht.
+Ein offener Standard (von Anthropic, Open Source) der definiert, wie KI-Modelle mit externen Tools und Datenquellen kommunizieren – standardisiert, typsicher und wiederverwendbar.
 
 ```
-Ohne MCP:           KI ← Text-Prompt → Du ← API → System
-Mit MCP:            KI ← MCP → System (direkt, mit Kontext)
+Ohne MCP:           KI ← Text-Prompt → Du ← manuell → System
+Mit MCP:            KI ← MCP-Protokoll → MCP-Server → System (direkt)
 ```
 
-**MCP ist wie ein USB-Standard für KI-Tools:**
-- Einmal einen MCP-Server schreiben
-- In Claude Code, Copilot, und jedem anderen MCP-Client nutzen
+**Die USB-Analogie:**
+```
+Vor USB:   Jedes Gerät = eigener Anschluss (Drucker, Scanner, Kamera = 3 verschiedene Ports)
+Mit USB:   Ein Standard → jedes Gerät funktioniert überall
+
+Vor MCP:   Jedes Tool = eigene Integration (DB, Browser, GitHub = 3 verschiedene Implementierungen)
+Mit MCP:   Ein Protokoll → jeder MCP-Server funktioniert in jedem MCP-Client
+```
+
+### MCP-Clients (die KI nutzt den Server)
+- Claude Code, Claude Desktop
+- GitHub Copilot (VS Code)
+- Cursor, Windsurf, Cline
+- Jede App die das MCP-Protokoll implementiert
 
 ---
 
-## 3. Anatomie eines MCP-Servers
+## 3. MCP auf Protokoll-Ebene
+
+### Das Protokoll: JSON-RPC 2.0
+
+MCP basiert auf **JSON-RPC 2.0** – ein einfaches Request/Response-Format über JSON:
+
+```typescript
+// Client → Server: "Welche Tools hast du?"
+{ "jsonrpc": "2.0", "method": "tools/list", "id": 1 }
+
+// Server → Client: "Hier sind meine Tools"
+{ "jsonrpc": "2.0", "result": {
+    "tools": [{
+      "name": "query-table",
+      "description": "Führt eine SELECT-Query auf einer Tabelle aus",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tableName": { "type": "string" },
+          "limit": { "type": "number", "default": 50 }
+        },
+        "required": ["tableName"]
+      }
+    }]
+  }, "id": 1 }
+
+// Client → Server: "Führe dieses Tool aus"
+{ "jsonrpc": "2.0", "method": "tools/call", "params": {
+    "name": "query-table",
+    "arguments": { "tableName": "CUSTOMERS", "limit": 10 }
+  }, "id": 2 }
+
+// Server → Client: "Hier ist das Ergebnis"
+{ "jsonrpc": "2.0", "result": {
+    "content": [{ "type": "text", "text": "10 Kunden gefunden: ..." }]
+  }, "id": 2 }
+```
+
+### Transport: Wie Server und Client kommunizieren
+
+**stdio (Standard für lokale Server):**
+```
+Claude Code startet den MCP-Server als Child-Process
+  → Kommunikation über stdin/stdout (wie eine Pipe)
+  → Kein HTTP, kein Port, kein Netzwerk
+  → Server läuft nur solange Claude Code läuft
+```
+
+**HTTP + SSE (für remote/shared Server):**
+```
+MCP-Server läuft als Web-Service (z.B. auf einem internen Server)
+  → Client verbindet sich über HTTP
+  → Server-Sent Events (SSE) für Streaming-Antworten
+  → Mehrere Clients können sich gleichzeitig verbinden
+```
+
+**Für unsere Schulung:** Wir nutzen **stdio** – einfacher, sicherer, kein Netzwerk-Setup.
+
+### Der MCP-Lifecycle (4 Phasen)
+
+```
+Phase 1: INITIALIZE
+  Client startet Server → Server meldet seine Capabilities
+  (welche Features unterstützt er: tools, resources, prompts?)
+
+Phase 2: DISCOVERY
+  Client fragt: tools/list, resources/list
+  → Server liefert alle verfügbaren Tools mit Namen, Descriptions, Schemas
+
+Phase 3: OPERATION
+  Client ruft Tools auf: tools/call → Server führt aus → Ergebnis zurück
+  (kann beliebig oft wiederholt werden)
+
+Phase 4: SHUTDOWN
+  Client beendet Verbindung → Server stoppt (bei stdio)
+```
+
+---
+
+## 4. Einen MCP-Server bauen (TypeScript)
+
+### Minimaler Server mit dem offiziellen SDK
+
+```typescript
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
+
+// 1. Server erstellen
+const server = new McpServer({
+  name: "demo-server",
+  version: "1.0.0"
+});
+
+// 2. Tool registrieren
+server.tool(
+  "greet",                              // Tool-Name
+  "Begrüßt einen User mit Namen",       // Description (= Prompt für die KI!)
+  { name: z.string() },                 // Input-Schema (Zod-Validierung)
+  async ({ name }) => ({                // Handler-Funktion
+    content: [{ type: "text", text: `Hallo ${name}!` }]
+  })
+);
+
+// 3. Transport starten (stdio)
+const transport = new StdioServerTransport();
+await server.connect(transport);
+```
+
+**Das ist ein vollständiger MCP-Server in 15 Zeilen.** Er kann sofort in Claude Code oder Copilot genutzt werden.
+
+### Resource registrieren
+
+```typescript
+server.resource(
+  "db-schema",                                    // Resource-Name
+  "db://schema",                                  // URI
+  async () => ({
+    contents: [{
+      uri: "db://schema",
+      text: "CUSTOMERS(id, name, email)\nORDERS(id, customer_id, total)"
+    }]
+  })
+);
+```
+
+---
+
+## 5. Anatomie eines MCP-Servers
 
 Ein MCP-Server stellt drei Dinge bereit:
 
@@ -70,8 +208,12 @@ Was die KI *tun* kann – mit Parametern und Rückgabewerten.
 {
   name: "get-user",
   description: "Lädt einen User aus der Datenbank anhand der ID",
-  parameters: {
-    userId: { type: "string", description: "UUID des Users" }
+  inputSchema: {
+    type: "object",
+    properties: {
+      userId: { type: "string", description: "UUID des Users" }
+    },
+    required: ["userId"]
   }
 }
 ```
@@ -87,8 +229,20 @@ Was die KI *lesen* kann – statische oder dynamische Datenquellen.
 
 ### Prompts (Vorlagen)
 Vorgefertigte Prompt-Templates für häufige Aufgaben.
+```typescript
+server.prompt(
+  "analyze-table",
+  { tableName: z.string() },
+  ({ tableName }) => ({
+    messages: [{
+      role: "user",
+      content: { type: "text", text: `Analysiere die Tabelle ${tableName}: Struktur, Datenqualität, Anomalien.` }
+    }]
+  })
+);
+```
 
-### Wie Claude entscheidet welches Tool aufgerufen wird
+### Wie Claude entscheidet welches Tool aufgerufen wird (Tool-Auswahl)
 
 Die KI bekommt alle Tool-Definitionen als Teil ihres System-Prompts. Pro Tool: `name`, `description`, `inputSchema`. Die KI matcht den User-Prompt gegen die Descriptions.
 
@@ -106,7 +260,7 @@ Die KI bekommt alle Tool-Definitionen als Teil ihres System-Prompts. Pro Tool: `
 ```typescript
 // ✅ Klar, spezifisch, mit Anwendungsfall
 { name: "list-tables",
-  description: "Listet alle Tabellennamen der Oracle-Datenbank auf.
+  description: "Listet alle Tabellennamen der PostgreSQL-Datenbank auf.
                 Nutze dieses Tool als ERSTEN Schritt um zu verstehen
                 welche Daten verfügbar sind." }
 
@@ -139,7 +293,7 @@ Tool-Call Ergebnis:
 
 ---
 
-## 4. MCP in der Praxis: Konfiguration
+## 6. MCP in der Praxis: Konfiguration
 
 ### In Claude Code (`.mcp.json`):
 ```json
@@ -174,7 +328,7 @@ Tool-Call Ergebnis:
 
 ---
 
-## 5. MCP + PostgreSQL
+## 7. MCP + PostgreSQL
 
 Warum ist das so mächtig?
 
@@ -191,7 +345,7 @@ Mit MCP:  KI führt Queries selbst aus, liest Schema, analysiert Daten
 
 ---
 
-## 6. Authentifizierung & Autorisierung
+## 8. Authentifizierung & Autorisierung
 
 Ein MCP-Server der auf eine Datenbank zugreift braucht Schutz.
 
@@ -253,7 +407,7 @@ const result = await connection.execute(
 
 ---
 
-## 6b. Security-Checklist für KI-Einsatz im Unternehmen
+## 8b. Security-Checklist für KI-Einsatz im Unternehmen
 
 Über MCP hinaus gelten diese Security-Grundregeln für jeden KI-Einsatz:
 
@@ -281,7 +435,7 @@ const result = await connection.execute(
 
 ---
 
-## 7. Live-Demo: Playwright MCP (Microsoft, offiziell)
+## 9. Live-Demo: Playwright MCP (Microsoft, offiziell)
 
 Der Playwright MCP-Server ist schon fertig – einfach nutzen:
 
