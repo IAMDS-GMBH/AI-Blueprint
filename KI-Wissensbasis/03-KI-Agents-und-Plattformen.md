@@ -76,7 +76,7 @@
 
 ## Claude Code – Spezialisierte Agent-Konfiguration `⭐ HOCH`
 
-> Umgesetzt im DEV-SETUP (`.claude/agents/`). Jeder Agent läuft isoliert im eigenen Kontextfenster.
+> Umgesetzt im dev-setup-template (`.claude/agents/`). Jeder Agent läuft isoliert im eigenen Kontextfenster.
 
 ### Konzept: Rollenbasierte Agents
 

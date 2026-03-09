@@ -166,6 +166,34 @@ if (toolName === 'delete-user' && !hasAdminRole(apiKey)) {
 
 ---
 
+## 6b. Security-Checklist für KI-Einsatz im Unternehmen
+
+Über MCP hinaus gelten diese Security-Grundregeln für jeden KI-Einsatz:
+
+```
+✅ Datenklassifizierung:   Welche Daten dürfen an welche KI? (Cloud vs. lokal)
+✅ Anbieter-Compliance:    DSGVO, SOC2, ISO 27001 geprüft?
+✅ API-Key-Management:     Sichere Verwaltung aller KI-API-Keys (Secret Manager, Rotation)
+✅ Output-Validierung:     KI-Outputs vor Nutzung immer prüfen
+✅ Logging:                Alle KI-Interaktionen auditierbar loggen
+✅ Lokale Alternativen:    Sensible Daten nur mit lokalen Modellen (OLLAMA)
+✅ Security Scans:         Automatisch in CI/CD integriert (Claude Code Security Scans)
+✅ Penetration Testing:    Regelmäßig mit KI-Support
+```
+
+**Risiko-Matrix:**
+
+| Risiko | Wahrscheinlichkeit | Impact | Maßnahme |
+|--------|-------------------|--------|----------|
+| Datenleck an Cloud-KI | Mittel | Hoch | Datenklassifizierung, lokale Modelle |
+| Halluzinierte Code-Fehler | Hoch | Mittel | Code Review, Security Scans, Tests |
+| API-Key-Exposure | Niedrig | Hoch | Secret Management, Key Rotation |
+| Compliance-Verstöße | Niedrig | Sehr Hoch | Regelmäßige Audits, Trusted AI Framework |
+
+> Vollständige Details → `KI-Wissensbasis/10-KI-Security.md`
+
+---
+
 ## 7. Live-Demo: Playwright MCP (Microsoft, offiziell)
 
 Der Playwright MCP-Server ist schon fertig – einfach nutzen:

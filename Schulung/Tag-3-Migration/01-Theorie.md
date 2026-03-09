@@ -401,3 +401,39 @@ Mehr Details → `KI-Wissensbasis/15-Agent-Einsatz-im-Entwicklungsalltag.md` (Ab
 **Bitte mitbringen:**
 - 1-2 COBOL-Module aus eurem Unternehmen (anonymisiert)
 - Bekannte Test-Inputs und erwartete Outputs
+
+---
+
+## 12. Ausblick: Wie geht es nach der Schulung weiter?
+
+### Nächste Schritte für euer Unternehmen
+
+**RAG – KI mit Unternehmenswissen füttern**
+```
+Euer Chatbot von Tag 1 kann mit RAG (Retrieval Augmented Generation) erweitert werden:
+→ Interne Dokumente, Wikis, Confluence-Seiten → Vektor-Datenbank
+→ KI beantwortet Fragen basierend auf euren echten Daten
+→ Tools: Google Notebook LM, CLaRa (Apple), GraphRAG
+```
+
+**Workflow-Automatisierung mit n8n + KI**
+```
+Wiederkehrende Prozesse automatisieren:
+→ Claude Opus beschreibt den Workflow in natürlicher Sprache
+→ n8n führt ihn aus (JSON-Import)
+→ Beispiel: Ticket erstellt → KI analysiert → Branch erstellt → Tests laufen
+```
+
+**Automatisierungs-Reifegrad:**
+
+| Level | Beschreibung | Beispiel |
+|-------|-------------|----------|
+| 1 – Manuell | Alles von Hand | Developer schreibt, testet, deployed manuell |
+| 2 – KI-unterstützt | KI schlägt vor, Mensch entscheidet | Copilot Autocomplete, Code Review |
+| 3 – KI-orchestriert | KI führt aus, Mensch verifiziert | Claude Code mit /plan + Auto-Accept |
+| 4 – KI-autonom | KI arbeitet selbstständig (nicht-kritische Tasks) | Ralph-Loop, Swarm für Migrations |
+| 5 – Multi-Agent | Mehrere KI-Agents koordinieren sich | Enterprise-Modernisierung im Factory-Modus |
+
+**Ziel:** Level 3 für den Alltag, Level 4 für Routine-Tasks, Level 5 für große Modernisierungen.
+
+> Weiterführende Themen in der `KI-Wissensbasis/`: RAG (13), Automatisierung (09), Strategie (14)

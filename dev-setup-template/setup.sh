@@ -24,7 +24,7 @@ NC='\033[0m'
 
 echo ""
 echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}  KI-Setup Installer – DEV-SETUP        ${NC}"
+echo -e "${BLUE}  KI-Setup Installer – dev-setup-template        ${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 echo "Ziel-Verzeichnis: ${TARGET_DIR}"

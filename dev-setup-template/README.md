@@ -13,7 +13,7 @@ git clone https://[euer-server]/ai-knowledgebase.git
 
 # In euer Projekt wechseln und Setup ausfuehren
 cd mein-projekt
-bash ../ai-knowledgebase/DEV-SETUP/setup.sh
+bash ../ai-knowledgebase/dev-setup-template/setup.sh
 ```
 
 **Das war's.** Danach nur noch Platzhalter in `CLAUDE.md` ersetzen und `claude` starten.
@@ -37,7 +37,7 @@ cd ai-knowledgebase && git pull
 # Agents, Rules, Skills werden aktualisiert
 # CLAUDE.md, copilot-instructions.md und lessons.md bleiben erhalten
 cd mein-projekt
-bash ../ai-knowledgebase/DEV-SETUP/setup.sh --update
+bash ../ai-knowledgebase/dev-setup-template/setup.sh --update
 ```
 
 **Was --update aktualisiert:** `.claude/agents/`, `.claude/rules/`, `.claude/skills/`,
@@ -62,14 +62,14 @@ git subtree pull --prefix=.ki-setup \
   https://[euer-server]/ai-knowledgebase.git main --squash
 
 # Setup ausfuehren
-bash .ki-setup/DEV-SETUP/setup.sh --update
+bash .ki-setup/dev-setup-template/setup.sh --update
 ```
 
 Tipp: Als Makefile-Target anlegen:
 ```makefile
 ki-update:
 	cd .ki-setup && git pull
-	bash .ki-setup/DEV-SETUP/setup.sh --update
+	bash .ki-setup/dev-setup-template/setup.sh --update
 ```
 Dann reicht `make ki-update` fuer alle.
 

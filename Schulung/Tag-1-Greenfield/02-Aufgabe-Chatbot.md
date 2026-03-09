@@ -31,7 +31,7 @@ dass der Chatbot Oracle-Datenbankfragen beantworten kann.
 ## Zeitplan
 
 ```
-11:00–11:20  Projekt anlegen + DEV-SETUP einrichten (setup.sh)
+11:00–11:20  Projekt anlegen + dev-setup-template einrichten (setup.sh)
 11:20–11:40  Plan mit KI erstellen
 11:40–12:00  DTOs + LLM Service (Teil 1)
 ── Mittagspause ──
@@ -57,7 +57,7 @@ Spring Web, Lombok
 
 ---
 
-### Schritt 1: Projekt anlegen + DEV-SETUP einrichten (20 Min)
+### Schritt 1: Projekt anlegen + dev-setup-template einrichten (20 Min)
 
 **Projektordner anlegen:**
 ```bash
@@ -67,9 +67,9 @@ cd chatbot-backend
 
 **KI-Setup aus dem Schulungs-Repo kopieren:**
 ```bash
-# setup.sh aus DEV-SETUP einmalig ausführen
+# setup.sh aus dev-setup-template einmalig ausführen
 # (Pfad anpassen je nachdem wo ihr das Schulungs-Repo geklont habt)
-bash ../ai-knowledgebase/DEV-SETUP/setup.sh
+bash ../ai-knowledgebase/dev-setup-template/setup.sh
 ```
 
 Das Script kopiert automatisch:
@@ -98,7 +98,7 @@ localhost:5173 erlaubt (Vue.js Frontend)
 ## Keine Spring Security
 (Schulungsumgebung – kein Auth nötig)
 ```
-> Den Rest von CLAUDE.md (Tech Stack, Konventionen, etc.) lasst ihr – der kommt vom DEV-SETUP und passt bereits.
+> Den Rest von CLAUDE.md (Tech Stack, Konventionen, etc.) lasst ihr – der kommt vom dev-setup-template und passt bereits.
 
 **Spring Boot Projekt erstellen (Claude Code):**
 ```bash
@@ -220,7 +220,7 @@ TypeScript, Vite, Pinia, Axios
 
 ---
 
-### Schritt 6: Frontend-Projekt anlegen + DEV-SETUP (20 Min)
+### Schritt 6: Frontend-Projekt anlegen + dev-setup-template (20 Min)
 
 **Projektordner anlegen:**
 ```bash
@@ -230,7 +230,7 @@ cd chatbot-frontend
 
 **KI-Setup einrichten:**
 ```bash
-bash ../ai-knowledgebase/DEV-SETUP/setup.sh
+bash ../ai-knowledgebase/dev-setup-template/setup.sh
 ```
 
 **`copilot-instructions.md` für dieses Projekt anpassen** (`.github/copilot-instructions.md`):
@@ -251,7 +251,7 @@ Response: { "reply": "...", "model": "..." }
 - Typing-Indikator ("..." animiert) während API-Call
 - Eingabe unten: Textarea + Senden-Button, Enter = Senden
 ```
-> Den Rest der `copilot-instructions.md` lasst ihr – kommt vom DEV-SETUP.
+> Den Rest der `copilot-instructions.md` lasst ihr – kommt vom dev-setup-template.
 
 **Vue.js Projekt erstellen (Copilot Agent Mode, Ctrl+Shift+I):**
 ```

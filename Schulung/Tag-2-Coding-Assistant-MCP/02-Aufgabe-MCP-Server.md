@@ -73,7 +73,7 @@ npm install
 cp .env.example .env
 ```
 
-Das DEV-SETUP ist bereits vom Schulungs-Repo vorhanden – das `.mcp.json` und
+Das dev-setup-template ist bereits vom Schulungs-Repo vorhanden – das `.mcp.json` und
 `.vscode/mcp.json` in eurem Chatbot-Backend-Ordner werden in Schritt 4 ergänzt.
 
 ### `.env` mit Oracle-Verbindungsdaten ausfüllen

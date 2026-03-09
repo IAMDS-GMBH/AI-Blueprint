@@ -65,7 +65,7 @@ dann profitiert das ganze Team automatisch davon.
 ```
 
 **Live-Demo:**
-1. CLAUDE.md aus DEV-SETUP zeigen
+1. CLAUDE.md aus dev-setup-template zeigen
 2. Prompt ohne CLAUDE.md → unpassendes Ergebnis
 3. Prompt mit CLAUDE.md → passt sofort
 

@@ -81,7 +81,7 @@ git clone https://[url]/ai-knowledgebase.git
 cd ai-knowledgebase
 ```
 
-**Wichtig:** Das Repo enthält in `DEV-SETUP/` die vollständige KI-Konfiguration
+**Wichtig:** Das Repo enthält in `dev-setup-template/` die vollständige KI-Konfiguration
 (CLAUDE.md, .claude/, .github/, .mcp.json). Die Teilnehmer nutzen dieses Setup
 für ihre eigenen Übungs-Projekte.
 
@@ -89,7 +89,7 @@ für ihre eigenen Übungs-Projekte.
 
 ```
 ai-knowledgebase/
-  DEV-SETUP/                  ← KI-Setup für Projekte (setup.sh + alle Configs)
+  dev-setup-template/                  ← KI-Setup für Projekte (setup.sh + alle Configs)
   KI-Wissensbasis/            ← Nachschlagewerk
   Schulung/
     README-Trainer.md         ← NUR für Trainer (ausblenden oder Branch)
@@ -103,8 +103,8 @@ ai-knowledgebase/
 ### Was jeder Teilnehmer selbst erstellt (lokal, NICHT im Repo)
 
 ```
-chatbot-backend/    ← Tag 1: Spring Boot + LLM API (mit setup.sh aus DEV-SETUP)
-chatbot-frontend/   ← Tag 1: Vue.js Chat-UI (mit setup.sh aus DEV-SETUP)
+chatbot-backend/    ← Tag 1: Spring Boot + LLM API (mit setup.sh aus dev-setup-template)
+chatbot-frontend/   ← Tag 1: Vue.js Chat-UI (mit setup.sh aus dev-setup-template)
 ```
 Tag 2 und Tag 3: Arbeiten direkt mit den Dateien aus dem Schulungs-Repo.
 
@@ -113,7 +113,7 @@ Tag 2 und Tag 3: Arbeiten direkt mit den Dateien aus dem Schulungs-Repo.
 Für jedes neue Übungs-Projekt:
 ```bash
 mkdir chatbot-backend && cd chatbot-backend
-bash ../ai-knowledgebase/DEV-SETUP/setup.sh
+bash ../ai-knowledgebase/dev-setup-template/setup.sh
 # → KI-Setup ist drin. Dann CLAUDE.md + MEMORY.md projektspezifisch anpassen.
 ```
 
@@ -138,7 +138,7 @@ claude --version
 
 # 6. setup.sh testen (im Chatbot-Projektordner)
 mkdir ~/chatbot-test && cd ~/chatbot-test
-bash ../ai-knowledgebase/DEV-SETUP/setup.sh
+bash ../ai-knowledgebase/dev-setup-template/setup.sh
 ls .claude/   # → agents/ commands/ rules/ skills/ vorhanden?
 ```
 
@@ -149,7 +149,7 @@ ls .claude/   # → agents/ commands/ rules/ skills/ vorhanden?
 | Tag | Thema | Übung |
 |-----|-------|-------|
 | Tag 1 | Greenfield, CLAUDE.md, KERNEL, Plan Mode | KI-Chatbot (Spring Boot Backend + Vue.js Frontend) |
-| Tag 2 (VM) | KI als Coding Assistant, Kontext-Hierarchie | Coding mit DEV-SETUP, lessons.md |
+| Tag 2 (VM) | KI als Coding Assistant, Kontext-Hierarchie | Coding mit dev-setup-template, lessons.md |
 | Tag 2 (NM) | MCP-Server bauen | Oracle MCP + Chatbot aus Tag 1 verbinden |
 | Tag 3 (VM) | COBOL-Analyse mit KI | Synthetische Beispiele (payroll + inventory) |
 | Tag 3 (NM) | COBOL-Migration zu Java | Eigenes COBOL-Modul des Unternehmens |
@@ -171,7 +171,7 @@ ls .claude/   # → agents/ commands/ rules/ skills/ vorhanden?
 
 ### Theorie-Demo (09:15–10:45)
 **Live zeigen (90 Min):**
-1. `DEV-SETUP/CLAUDE.md` öffnen – erklären was jede Sektion macht (15 Min)
+1. `dev-setup-template/CLAUDE.md` öffnen – erklären was jede Sektion macht (15 Min)
 2. `setup.sh` live ausführen – zeigen was kopiert wird (10 Min)
 3. KERNEL-Framework: Schlechter Prompt vs. KERNEL-Prompt (20 Min)
 4. `/plan` live zeigen (20 Min)
@@ -265,7 +265,7 @@ Ohne das läuft `oracledb` npm Package nicht.
 | Problem | Lösung |
 |---------|--------|
 | KI antwortet auf Englisch | Prompt auf Deutsch + "Antworte immer auf Deutsch" in CLAUDE.md |
-| setup.sh läuft nicht | `chmod +x DEV-SETUP/setup.sh` oder direkt `bash setup.sh` |
+| setup.sh läuft nicht | `chmod +x dev-setup-template/setup.sh` oder direkt `bash setup.sh` |
 | ANTHROPIC_API_KEY nicht gesetzt | `export ANTHROPIC_API_KEY=sk-ant-...` im Terminal |
 | CORS-Fehler Frontend→Backend | `WebMvcConfig` mit `localhost:5173` allowedOrigins prüfen |
 | oracledb Installation schlägt fehl | Oracle Instant Client Pfad in `.npmrc` oder ENV setzen |
@@ -294,7 +294,7 @@ Schulung/
     01-Theorie.md
     02-Aufgabe-Migration.md
     cobol-beispiele/
-DEV-SETUP/                              ← KI-Setup das alle Teilnehmer nutzen
+dev-setup-template/                              ← KI-Setup das alle Teilnehmer nutzen
   setup.sh                             ← Einzeilen-Setup für Projekte
   CLAUDE.md, MEMORY.md                 ← Templates
   .claude/, .github/, .mcp.json        ← KI-Konfiguration

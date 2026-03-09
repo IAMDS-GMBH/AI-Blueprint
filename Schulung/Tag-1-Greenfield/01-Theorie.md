@@ -72,6 +72,23 @@ Output: Funktionierendes System
 - Architektur-Denken wird wichtiger, nicht unwichtiger
 - Prompt-Qualität = Code-Qualität
 
+### Der Paradigmenwechsel im Detail
+
+| | BISHER | ZUKUNFT |
+|--|--------|---------|
+| **Rolle** | Entwickler = Coder | Entwickler = Problem Solver |
+| **Kernaufgabe** | Code schreiben | Probleme definieren + Architektur |
+| **Skill** | Programmiersprachen beherrschen | Architektur + Prompt Engineering |
+| **Output** | Lines of Code | Funktionierende Systeme |
+| **Tools** | IDE + Compiler | IDE + KI-Agents |
+| **Produktivität** | 1 Entwickler | 1 Entwickler + KI = 3-5x Output |
+
+**Was das für euer Unternehmen heißt:**
+- **Hiring:** Problemlöser suchen, nicht nur Programmierer
+- **Training:** Prompt Engineering und KI-Orchestrierung als Pflicht-Skill
+- **Reviews:** Lösungs-Qualität bewerten, nicht nur Code-Qualität
+- **Kultur:** Safe-to-Fail-Umgebung für KI-Experimente schaffen
+
 ---
 
 ## 2. Vibe Coding – Was ist das?

@@ -39,7 +39,7 @@ globs: ["**/*.java"]   ← RICHTIG
 paths: ["..."]         ← FALSCH (wird ignoriert)
 ```
 
-**Empfohlene Rule-Struktur (unser DEV-SETUP):**
+**Empfohlene Rule-Struktur (unser dev-setup-template):**
 ```
 .claude/rules/
   java-spring.md        # Aktiv bei **/*.java
