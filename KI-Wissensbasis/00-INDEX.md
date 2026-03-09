@@ -60,6 +60,7 @@ In den einzelnen Dateien wird folgendes Schema verwendet:
 ### Tools & Frameworks
 - Shannon AI Pentest: https://shannon-ai.com/pentest-ai
 - GSD GitHub: https://github.com/gsd-build/get-shit-done
+- Vibe Kanban GitHub: https://github.com/BloopAI/vibe-kanban
 - Excalidraw for Teams: https://plus.excalidraw.com/excalidraw-for-teams
 - Draw.io MCP Server: https://mcpservers.org/servers/lgazo/drawio-mcp-server
 - Remotion Skills: https://github.com/remotion-dev/skills

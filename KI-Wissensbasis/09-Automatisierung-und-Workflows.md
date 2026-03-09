@@ -24,6 +24,12 @@
 
 ---
 
+## KI-Agent-Orchestrierung
+
+> Für KI-Agent-Orchestrierung mit visueller Kanban-Oberfläche → siehe Vibe Kanban in [03-KI-Agents-und-Plattformen.md](03-KI-Agents-und-Plattformen.md)
+
+---
+
 ## Workflow-Architektur Patterns 📸
 
 ### Aus den angehängten Bildern – Core Principles:

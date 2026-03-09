@@ -12,6 +12,31 @@
 - **Warum relevant:** Skalierung von KI-Arbeit für komplexe Projekte
 - **Aktion:** [ ] Deep-Dive: Wie funktioniert die Koordination? Welche Tasks eignen sich?
 
+### Vibe Kanban (BloopAI) `⭐ HOCH`
+- **Was:** Kanban-Board für KI-Coding-Agents — Tasks planen, Agents zuweisen, parallel ausführen, Diffs reviewen, mergen
+- **Link:** https://github.com/BloopAI/vibe-kanban
+- **Tech Stack:** Rust (Axum) Backend, React Frontend, SQLite, WebSockets
+- **Installation:** `npx vibe-kanban` (lokal, zero config) oder Docker (self-hosted)
+- **Unterstützte Agents:** Claude Code, Codex, Gemini CLI, Copilot, Amp, Cursor, OpenCode, Droid, +mehr
+- **Killer-Features:**
+  - Git-Worktree-Isolation pro Agent (paralleles Arbeiten ohne File-Konflikte)
+  - Multi-Agent parallel (5+ Tasks gleichzeitig)
+  - "Attempt"-Modell: gleicher Task → verschiedene Agents → bestes Ergebnis wählen
+  - MCP-Integration (bidirektional — nutzt MCP und exponiert sich als MCP-Server)
+  - Integrierter Diff-Viewer mit Inline-Commenting + Agent-Feedback
+  - Live-Streaming via WebSocket
+- **Vergleich zu /swarm:**
+  - /swarm = CLI-basiert, in Claude Code integriert, kurzlebig
+  - Vibe Kanban = UI-basiert, agent-agnostisch, persistentes Board, Review-Workflow
+  - Komplementär: /swarm für schnelle parallele Tasks, Vibe Kanban für größere Projekte mit Review-Bedarf
+- **Wann sinnvoll:**
+  - 3+ parallele unabhängige Tasks
+  - Multi-Agent-Vergleich (Claude vs. Codex vs. Gemini)
+  - Team-Projekte mit strukturiertem Review-Workflow
+  - Große Migrationen (jedes Modul = eine Karte)
+- **Wann NICHT:** Einfache 1-Task-Situationen, reines Autocomplete
+- **Aktion:** [ ] Lokal testen: `npx vibe-kanban`, 3 Tasks erstellen, mit Claude Code + Copilot vergleichen
+
 ### OpenAI Frontier (Coworkers) `⭐ HOCH`
 - **Was:** OpenAIs neues "Coworker"-Konzept – KI-Agents als vollwertige Teammitglieder
 - **Link:** https://openai.com/de-DE/index/introducing-openai-frontier/
