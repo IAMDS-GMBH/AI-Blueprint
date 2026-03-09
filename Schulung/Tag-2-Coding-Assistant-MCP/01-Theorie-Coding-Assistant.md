@@ -94,24 +94,41 @@ Fix: Im Prompt zusätzlich: "Ausschließlich <script setup> Composition API"
 
 ### Inline Autocomplete
 ```
-Wann: Während du tippst, bekannte Patterns
-Beispiel: Methoden-Signatur eingeben → KI vervollständigt Body
-Stärke: Schnell, kein Prompt nötig, fühlt sich natürlich an
-Grenze: Kein Kontext über aktuelle Datei hinaus
+Wann:     Während du tippst, bekannte Patterns
+Context:  Nur aktuelle Datei + offene Tabs (~2-5 Dateien)
+Latenz:   50-200ms (fühlt sich instant an)
+Tokens:   Wenig (nur kleiner Ausschnitt wird gesendet)
+Stärke:   Schnell, kein Prompt nötig, fühlt sich natürlich an
+Grenze:   Kein Projekt-weiter Kontext, keine CLAUDE.md/Instructions
 ```
 
 ### Agent Mode (Chat)
 ```
-Wann: Neue Features, Refactoring, Analyse
-Beispiel: "@workspace Refactore alle Services auf das Interface-Pattern"
-Stärke: Kann mehrere Dateien lesen und ändern, folgt Instructions
-Grenze: Langsamer, braucht guten Prompt
+Wann:     Neue Features, Refactoring, Analyse
+Context:  Gesamtes Workspace-Verzeichnis (via @workspace), Instructions geladen
+Latenz:   2-15 Sekunden (multi-file Analyse)
+Tokens:   Hoch (ganzer Workspace-Kontext wird geladen)
+Stärke:   Kann 10+ Dateien lesen und ändern, folgt Instructions
+Grenze:   Langsamer, höherer Token-Verbrauch, braucht guten Prompt
 ```
 
-### Faustregel:
+### Entscheidungsbaum: Welchen Modus wann?
 ```
-Inline     → Ich weiß was ich will, nur tippen ist lästig
-Agent Mode → Ich beschreibe ein Ziel, KI soll es umsetzen
+Tippe ich gerade Code und will Vervollständigung?
+  → JA: Inline (Tab drücken)
+Muss ich mehrere Dateien ändern oder verstehen?
+  → JA: Agent Mode (@workspace oder @DevAgent)
+Brauche ich Projekt-Konventionen (aus Instructions)?
+  → JA: Agent Mode (Inline kennt Instructions nicht)
+Will ich ein Feature autonom bauen lassen?
+  → JA: Agent Mode mit klarem KERNEL-Prompt
+```
+
+### Kosten-Perspektive
+```
+Inline:     ~100-500 Tokens pro Completion → Centbruchteile pro Aufruf
+Agent Mode: ~5.000-50.000 Tokens pro Anfrage → $0.05-$0.50 pro Feature
+→ Inline ist 100x günstiger, aber Agent Mode spart euch Stunden
 ```
 
 ---
@@ -126,8 +143,24 @@ Agent Mode → Ich beschreibe ein Ziel, KI soll es umsetzen
 Hauptkontext (sauber, fokussiert)
     ↓
 Sub-Agent: "Analysiere alle Service-Klassen und liste Duplikate"
-    ↓ Ergebnis zurück
+    ↓ Ergebnis zurück (nur das Ergebnis, nicht der ganze Analyse-Kontext)
 Hauptkontext weiterführen mit dem Ergebnis
+```
+
+**Was technisch passiert wenn ein Sub-Agent startet:**
+```
+Haupt-Chat:   [CLAUDE.md + bisherige Konversation] = 30% von 200k Tokens belegt
+Sub-Agent:    [Neues 200k Window] = 0% belegt → volle Kapazität für die Aufgabe
+              → Bekommt NUR: Task-Beschreibung + explizit übergebene Dateien
+              → Gibt NUR das Ergebnis zurück (nicht seinen internen Kontext)
+```
+
+**Kosten-Rechnung:**
+```
+1 Sub-Agent  = 1 neues Context Window = 1x Token-Kosten für die Aufgabe
+5 parallele  = 5 Windows = 5x Token-Kosten ABER: alle laufen gleichzeitig
+→ Lohnt sich wenn die Alternative "3 Stunden sequenziell" ist
+→ Lohnt sich NICHT für einfache Aufgaben die in 5 Minuten erledigt sind
 ```
 
 **Wann Sub-Agent einsetzen:**
@@ -355,6 +388,20 @@ Der `/ralph` Command ist unser Qualitäts-Firewall vor dem Commit:
   6. Elegant? (Staff-Engineer-Standard)
 → Was fehlschlägt wird sofort gefixt, erst dann: fertig
 ```
+
+**Was /ralph konkret ausgibt (Beispiel):**
+```
+✅ Vollständig: Alle 3 Endpoints implementiert (POST, GET, DELETE)
+✅ Korrekt: Kompiliert, Tests grün (5/5)
+⚠️ Konventionen: UserService fehlt Interface-Abstraktion → FIX: Interface erstellt
+✅ Sicher: Kein SQL-Injection, @Valid auf allen Inputs
+✅ Minimal: Keine ungefragten Extras
+⚠️ Elegant: Duplicate Code in createUser/updateUser → FIX: Shared Validation-Methode
+
+→ 2 Issues gefunden und automatisch gefixt. Ergebnis jetzt bereit für Review.
+```
+
+**Einschränkung:** /ralph kann selbst halluzinieren – z.B. "Tests grün" melden ohne sie tatsächlich ausgeführt zu haben. Deshalb: Nach /ralph immer noch einmal `mvn test` oder `npm test` selbst laufen lassen.
 
 **Copilot-Äquivalent:** Durch den "Selbst-Verifikation"-Abschnitt in `copilot-instructions.md` wird dieses Verhalten auch Copilot eintrainiert — ohne expliziten Command, als feste Verhaltensregel.
 

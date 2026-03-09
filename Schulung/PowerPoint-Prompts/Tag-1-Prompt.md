@@ -1,14 +1,22 @@
 # PowerPoint-Prompt: Tag 1 — Greenfield-Entwicklung mit KI
 
 ## Anweisung
-Erstelle eine professionelle PowerPoint-Präsentation für einen Schulungstag zum Thema "Greenfield-Entwicklung mit KI". Die Präsentation begleitet einen ganzen Trainingstag (Theorie 9:00-11:00, Praxis 11:00-15:15) für 6 Software-Entwickler.
+Erstelle eine professionelle PowerPoint-Präsentation für einen Schulungstag zum Thema "Greenfield-Entwicklung mit KI". Die Präsentation begleitet einen ganzen Trainingstag (Theorie 9:00-11:00, Praxis 11:00-15:15) für 6 erfahrene Software-Entwickler (Java, Spring Boot, Vue.js).
+
+**WICHTIG — Zielgruppe:** Die Teilnehmer sind erfahrene Entwickler. Keine Grundlagen erklären die sie bereits kennen (z.B. was REST ist, was eine Datenbank ist). Stattdessen technische Tiefe: Token-Kosten, Context-Window-Management, Code-Vergleiche (vorher/nachher). Mindestens 40% der Folien sollen Code-Beispiele oder technische Diagramme enthalten.
 
 ## Design-Vorgaben
-- Professionell, modern, clean
+- Stil inspiriert von iamds.com: modern, clean, viel Weißraum, tech-professional
 - Wenig Text pro Folie (max. 5-6 Bulletpoints, kurze Sätze)
 - Große Schrift (min. 24pt für Body, 36pt für Titel)
+- Schriftart: Open Sans (oder Calibri als Fallback)
 - Diagramme und Tabellen wo möglich statt Fließtext
-- Farbschema: Dunkelblau (#1a365d) als Primärfarbe, helles Grau (#f7fafc) als Hintergrund, Akzentfarbe Orange (#ed8936)
+- Farbschema:
+  - Primärfarbe: Deep Blue (#3f59ff) — für Überschriften, Buttons, Highlights
+  - Sekundärfarbe: Navy (#212b80) — für Titel, dunkle Hintergründe
+  - Akzentfarbe: Golden Yellow (#ffd440) — für Hervorhebungen, Call-to-Actions
+  - Hintergrund: Weiß (#ffffff) mit viel Weißraum
+  - Text: Dunkelgrau (#212121)
 - Jede Folie sollte eine klare Kernaussage haben
 - Sprache: Deutsch
 
@@ -27,23 +35,27 @@ Erstelle eine professionelle PowerPoint-Präsentation für einen Schulungstag zu
   - 10:30-11:00 — Tools, Plan Mode & Verifikation
   - 11:00-15:15 — Hands-on: KI-Chatbot bauen (mit Mittagspause)
 
-### Folie 3: Was ist ein LLM?
-- Vereinfachtes Diagramm: Text rein → Token-Vorhersage → Text raus
-- Kernaussage: "Ein LLM hat extrem viel Text gelesen und gelernt: Nach diesem Text kommt mit hoher Wahrscheinlichkeit dieser Text."
-- KI ist ein schneller Erstentwurf-Generator, kein Orakel
+### Folie 3: Wie ein LLM technisch arbeitet
+- 3 Schritte als Diagramm:
+  1. Tokenization (BPE): "getUserById" = 3 Tokens ["get", "User", "ById"] — CamelCase kostet mehr Tokens als snake_case
+  2. Transformer + Attention: Berechnet Wahrscheinlichkeit des nächsten Tokens basierend auf Kontext
+  3. Sampling: Temperature 0.0 = deterministisch (Code) vs. 0.7 = kreativ (Architektur-Alternativen)
+- Keine vereinfachte "Text gelesen"-Erklärung — stattdessen technische Darstellung
 
-### Folie 4: Was das in der Praxis heißt
-- Tabelle mit 4 Zeilen:
-  | Eigenschaft | Was das für euch heißt |
-  | KI ist kein Datenbank-Lookup | Sie erfindet Antworten – auch wenn falsch ("Halluzination") |
-  | KI hat ein Kontextfenster | Sieht nur den aktuellen Chat, nicht das ganze Repo |
-  | Prompt-Qualität = Output-Qualität | Je präziser die Eingabe, desto besser |
-  | KI kennt keine "Wahrheit" | Antwortet überzeugend auch wenn sie falsch liegt |
+### Folie 4: Token-Kosten — Was das konkret bedeutet
+- Kosten-Tabelle:
+  | Modell | Input/1M Tokens | Output/1M Tokens | Context Window | ~Kosten pro Feature |
+  | Claude Sonnet 4 | $3 | $15 | 200k | ~$0.18 |
+  | Claude Opus 4 | $15 | $75 | 200k | ~$0.90 |
+  | GPT-4o | $2.50 | $10 | 128k | ~$0.13 |
+- Kernaussage: "200k Tokens ≈ 500 Seiten Code. Aber: Je voller, desto schlechter (Context Rot)."
 
-### Folie 5: Warum halluziniert KI?
-- Grafik: Wahrscheinlichkeitsverteilung → KI wählt die wahrscheinlichste Antwort
-- Kernaussage: "KI sagt nicht 'ich weiß es nicht' – sie sagt die wahrscheinlichste Antwort."
-- Große Schrift unten: "Nie blind vertrauen. Immer verifizieren."
+### Folie 5: 3 typische Code-Halluzinationen
+- 3 Code-Beispiele:
+  1. Nicht-existierende API: `repository.findByNameContainingIgnoreCase()` — existiert nur mit korrekter Spring Data Config
+  2. Falsche Version: `WebSecurityConfigurerAdapter` — in Spring Boot 3 entfernt
+  3. Erfundene CLI-Flags: `mvn spring-boot:run --debug-port=5005` — existiert nicht so
+- Kernaussage: "KI kennt das Pattern, aber nicht EUER Projekt. Output immer gegen Compiler + Docs prüfen."
 
 ### Folie 6: Der Mindset-Shift
 - Zwei Boxen nebeneinander:
@@ -111,9 +123,11 @@ Erstelle eine professionelle PowerPoint-Präsentation für einen Schulungstag zu
 - Regel: "Klare Erfolgskriterien definieren"
 - Beispiel: "Schreib einen Test: POST /api/users mit gültigem Body → 201 Created"
 
-### Folie 17: L — Logical structure
+### Folie 17: L — Logical structure + KERNEL-Gesamtbeispiel
 - 4 Blöcke (Context → Task → Constraints → Format) als Schablone
-- Komplettes Beispiel mit Java Spring Boot
+- Komplettes KERNEL-Beispiel links, generierter Java-Code rechts (Vorher/Nachher):
+  - OHNE KERNEL: "Hilf mir eine Spring-App zu bauen" → generisches Hello-World (5 Zeilen Code)
+  - MIT KERNEL: Context/Task/Constraints/Format → vollständiger UserController + Service mit BCrypt, @Valid, Interface-Pattern (15 Zeilen Code)
 
 ### Folie 18: Erweiterte Prompting-Techniken
 - 4 Techniken als Kacheln:
@@ -174,7 +188,17 @@ Erstelle eine professionelle PowerPoint-Präsentation für einen Schulungstag zu
 - Teil 2 (GitHub Copilot): Vue.js Frontend
   - Vite-Projekt → Pinia Store → ChatWindow → Typing Indicator → Verbinden
 
-### Folie 28: Zusammenfassung Tag 1
+### Folie 28: Context-Window-Management
+- Grafik: Neuer Chat (5% belegt, 95% für Aufgabe) → Nach 30 Min (40%) → Nach 2h (70%, Qualität sinkt) → Voll (Komprimierung, Details verloren)
+- Warnsignale: KI wiederholt Fehler, vergisst Konventionen, generischer Code
+- Strategien-Tabelle:
+  | Situation | Strategie |
+  | Feature fertig | Neuen Chat starten |
+  | Context voll | /compact |
+  | Großes Feature | Sub-Agents von Anfang an |
+- Faustregel: "Ein Chat = ein Feature"
+
+### Folie 29: Zusammenfassung Tag 1
 - Key Takeaways (5 Bulletpoints):
   1. LLMs sind Wahrscheinlichkeits-Maschinen — immer verifizieren
   2. Entwickler = Problem Solver, KI = Umsetzer

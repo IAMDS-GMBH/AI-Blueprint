@@ -8,24 +8,37 @@
 
 ---
 
-## 1. Das Problem: KI spricht kein REST
+## 1. Das Problem: Warum MCP besser ist als REST für KI
 
-Standard REST-APIs sind für Menschen und Apps gemacht – nicht für KI-Modelle.
+KI *kann* REST-APIs nutzen (über Tool Use / Function Calling). Aber MCP löst Probleme die REST nicht adressiert:
 
-| Aspekt | REST API | Was KI braucht |
-|--------|----------|----------------|
-| Dokumentation | OpenAPI/Swagger (formal) | Natürlichsprachige Beschreibung |
-| Fehler | HTTP-Statuscodes | Erklärung was schiefging |
-| Discovery | Manuell lesen | Automatisch verstehen |
-| Kontext | Request/Response | "Was bedeutet dieses Ergebnis?" |
+| Aspekt | REST API + Tool Use | MCP |
+|--------|---------------------|-----|
+| Tool-Discovery | Ihr definiert Tools manuell in JSON | Server liefert Tool-Liste automatisch |
+| Schema-Inference | Ihr schreibt JSON Schema pro Endpoint | Server deklariert Parameter + Typen |
+| Fehlerbehandlung | HTTP-Statuscodes → KI muss interpretieren | Standardisiertes Error-Format mit Kontext |
+| Transport | HTTP/HTTPS (ein Protokoll) | stdio (lokal, kein Netzwerk) oder HTTP |
+| Multi-Client | Für jeden Client neu integrieren | Einmal bauen → Claude Code, Copilot, jeder MCP-Client |
 
-**Beispiel:**
+**Technisch: Was passiert bei einem MCP-Tool-Call?**
 ```
-KI fragt REST API: GET /api/v1/orders?status=PENDING
-API antwortet: [{"id": 1, "status": "PENDING", "customerId": 42, ...}]
+1. Claude Code startet MCP-Server als Child-Process (stdio)
+   → Server läuft lokal, keine HTTP-Verbindung nötig
 
-KI weiß nicht: Was bedeutet "PENDING"? Was kann sie damit tun?
+2. Server schickt Tool-Liste an Claude:
+   { tools: [{ name: "query-table", description: "...", inputSchema: {...} }] }
+
+3. Claude entscheidet basierend auf User-Prompt:
+   "Wie viele Kunden haben wir?" → wählt "query-table" weil description passt
+
+4. Claude sendet Tool-Call:
+   { name: "query-table", arguments: { tableName: "CUSTOMERS", limit: 1 } }
+   → Query: SELECT COUNT(*) FROM CUSTOMERS
+
+5. Server antwortet mit Ergebnis → Claude formuliert Antwort
 ```
+
+**Wichtig:** Die `description` eurer Tools ist ein Prompt an die KI. Sie entscheidet anhand dieser Beschreibung welches Tool sie aufruft. Schlechte Description = falsches Tool wird gewählt.
 
 ---
 
@@ -74,6 +87,55 @@ Was die KI *lesen* kann – statische oder dynamische Datenquellen.
 
 ### Prompts (Vorlagen)
 Vorgefertigte Prompt-Templates für häufige Aufgaben.
+
+### Wie Claude entscheidet welches Tool aufgerufen wird
+
+Die KI bekommt alle Tool-Definitionen als Teil ihres System-Prompts. Pro Tool: `name`, `description`, `inputSchema`. Die KI matcht den User-Prompt gegen die Descriptions.
+
+**Schlechte Tool-Description → KI wählt falsches Tool:**
+```typescript
+// ❌ Zu vage – KI weiß nicht wann sie es nutzen soll
+{ name: "get-data", description: "Holt Daten aus der Datenbank" }
+
+// ❌ Zu ähnlich zu anderem Tool – KI verwechselt sie
+{ name: "list-tables", description: "Zeigt Tabellen" }
+{ name: "describe-table", description: "Zeigt Tabellendetails" }
+```
+
+**Gute Tool-Description → KI wählt zuverlässig:**
+```typescript
+// ✅ Klar, spezifisch, mit Anwendungsfall
+{ name: "list-tables",
+  description: "Listet alle Tabellennamen der Oracle-Datenbank auf.
+                Nutze dieses Tool als ERSTEN Schritt um zu verstehen
+                welche Daten verfügbar sind." }
+
+{ name: "describe-table",
+  description: "Zeigt die Spaltenstruktur einer einzelnen Tabelle
+                (Spaltenname, Datentyp, nullable). Nutze dieses Tool
+                NACHDEM du list-tables aufgerufen hast." }
+```
+
+→ **Tipp:** Beschreibungen sollen der KI sagen *wann* und *warum* sie das Tool nutzen soll – nicht nur *was* es tut.
+
+### Token-Kosten von MCP-Tools
+
+Jeder MCP-Server kostet Tokens – auch wenn kein Tool aufgerufen wird:
+
+```
+Tool-Definitionen werden bei JEDEM API-Call mitgesendet:
+  4 Tools × ~200 Tokens pro Definition = ~800 Tokens pro Nachricht
+  → Bei 100 Nachrichten in einer Session: 80.000 Tokens nur für Tool-Definitionen
+
+Tool-Call Ergebnis:
+  SELECT * FROM CUSTOMERS LIMIT 50 → ~2.000-5.000 Tokens für die Response
+  → Große Ergebnisse füllen den Context schneller
+```
+
+**Deshalb:**
+- Max. 50 Rows pro Query (nicht 1000) → Token-Sparsamkeit
+- Sensible Spalten (Passwörter) filtern → weniger nutzlose Tokens
+- Nicht mehr MCP-Server konfigurieren als nötig → Tool-Definitionen kosten
 
 ---
 
@@ -157,12 +219,37 @@ if (toolName === 'delete-user' && !hasAdminRole(apiKey)) {
 }
 ```
 
-### Wichtige Sicherheitsregeln:
+### Konkret: SQL-Injection im MCP-Kontext
+
+**Das Risiko:** Die KI generiert den WHERE-Clause – und könnte (halluziniert oder durch Prompt Injection) schädliches SQL erzeugen.
+
+```typescript
+// ❌ UNSICHER: KI-generierter String direkt in Query
+const query = `SELECT * FROM ${tableName} WHERE ${whereClause}`;
+// → KI könnte generieren: whereClause = "1=1; DROP TABLE CUSTOMERS--"
+
+// ✅ SICHER: Parameterized Query + Whitelist
+const ALLOWED_TABLES = ['CUSTOMERS', 'ORDERS', 'PRODUCTS'];
+if (!ALLOWED_TABLES.includes(tableName.toUpperCase())) {
+  throw new Error(`Tabelle ${tableName} nicht erlaubt`);
+}
+// whereClause nur einfache Bedingungen erlauben (Regex-Validierung)
+if (!/^[A-Z_]+ (=|>|<|LIKE) :[0-9]+$/.test(whereClause)) {
+  throw new Error('Ungültige WHERE-Bedingung');
+}
+const result = await connection.execute(
+  `SELECT * FROM ${tableName} WHERE ${whereClause}`,
+  bindParams  // Parameterized!
+);
+```
+
+### Sicherheitsregeln:
 - [ ] Keine Datenbankpasswörter im Code – nur Umgebungsvariablen
 - [ ] Minimale DB-Rechte (Principle of Least Privilege)
-- [ ] SQL-Injection-Schutz: Parameterized Queries, kein String-Concat
-- [ ] Sensible Daten (Passwort-Hashes) nie über MCP exponieren
-- [ ] Rate Limiting für Tool-Calls
+- [ ] SQL-Injection-Schutz: Parameterized Queries + Tabellen-Whitelist
+- [ ] Sensible Spalten (PASSWORD, SECRET, API_KEY) automatisch ausfiltern
+- [ ] Rate Limiting: Max. 10 Tool-Calls pro Minute pro Client
+- [ ] Logging: Jeder Tool-Call wird geloggt (aber KEINE Query-Parameter → Datenschutz)
 
 ---
 

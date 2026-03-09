@@ -118,6 +118,26 @@ public class ClaimProcessingService {
 - Status-`char` in typsicheres `Enum` umgewandelt
 - Business-Logik 1:1 erhalten, aber mit modernen Patterns (Transactions, Events)
 
+**Was ihr zusätzlich prüfen müsst (KI vergisst das oft):**
+```java
+// Exception-Handling: Was passiert bei ungültigen Daten?
+public ClaimRecord processClaim(ClaimRecord claim) {
+    try {
+        validateClaim(claim);  // → kann ValidationException werfen
+        calculatePayout(claim);
+        updateClaimStatus(claim);
+        publishClaimEvent(claim);
+        return claimRepository.save(claim);
+    } catch (ValidationException e) {
+        claim.setApprovalStatus(ClaimStatus.REJECTED);
+        auditService.logRejection(claim, e.getMessage());  // Audit-Trail!
+        return claimRepository.save(claim);
+    }
+    // @Transactional sorgt für Rollback bei unerwarteten Exceptions
+}
+```
+→ KI generiert den Happy Path gut. Error Handling, Audit-Logging und Transaktions-Grenzen müsst ihr explizit anfordern.
+
 ---
 
 ### Beispiel B: Shell-Script/FTP → REST API (Logistik)
@@ -158,6 +178,19 @@ this.router.post('/api/v2/shipments',
 this.router.post('/api/v2/shipments/batch', upload.single('file'), ...);
 ```
 Ergebnis: Echtzeit statt Batch, 90% weniger Integrationsfehler, aber Rückwärtskompatibilität erhalten.
+
+**Was in Produktion noch dazu muss:**
+```typescript
+// Retry-Logik bei temporären Fehlern
+@Retryable(maxAttempts = 3, backoff = @Backoff(delay = 1000))
+async createShipment(data: ShipmentData): Promise<Shipment> { ... }
+
+// Idempotency-Key gegen Doppelverarbeitung
+this.router.post('/api/v2/shipments',
+    this.checkIdempotencyKey,  // Header: X-Idempotency-Key
+    ...
+);
+```
 
 ---
 
@@ -279,12 +312,54 @@ PROCEDURE DIVISION.         ← Business-Logik (wie main() + Methoden)
 
 | COBOL-Konzept | Java-Äquivalent | Falle |
 |---------------|-----------------|-------|
-| `PIC 9(5)` | `int` | Führende Nullen gehen verloren |
-| `PIC 9(7)V99` | `BigDecimal` | **Niemals `double`!** Rundungsfehler |
-| `PIC X(30)` | `String` | COBOL paddet mit Leerzeichen auf |
-| Level-Numbers (01, 05, 10) | Verschachtelte Klassen | Oft mehrere Ebenen tief |
-| `PERFORM UNTIL` | `while`-Schleife | **Nicht** `for-each`! |
+| `PIC 9(5)` | `int` | Führende Nullen gehen verloren (z.B. Postleitzahl "01234") |
+| `PIC 9(7)V99` | `BigDecimal` | **Niemals `double`!** Rundungsfehler bei Geldbeträgen |
+| `PIC X(30)` | `String.trim()` | COBOL paddet mit Leerzeichen → immer `.trim()` aufrufen |
+| Level-Numbers (01, 05, 10) | Verschachtelte Klassen / Records | Oft mehrere Ebenen tief |
+| `PERFORM UNTIL` | `while`-Schleife | **Nicht** `for-each`! COBOL prüft Bedingung am Anfang |
 | `COMPUTE` | Arithmetik | Dezimalstellenpräzision beachten |
+| `COMP-3` (Packed Decimal) | `BigDecimal` | BCD-Format: 2 Ziffern pro Byte + Sign-Nibble |
+| `SIGN IS SEPARATE` | Vorzeichen-Handling | Vorzeichen als eigenes Zeichen (+/-) gespeichert |
+| `REDEFINES` | Union-ähnlich | Selber Speicher, andere Interpretation → verschiedene DTOs |
+
+### Erweiterte COBOL-Konzepte die KI oft falsch migriert
+
+**COPYBOOKS (wie C-Header-Dateien):**
+```cobol
+*--- COPY CUSTOMER-RECORD.CPY ---
+  01 CUSTOMER-RECORD.
+     05 CUST-ID      PIC 9(5).
+     05 CUST-NAME    PIC X(30).
+     05 CUST-ADDR    PIC X(50).
+```
+→ Werden in mehreren Programmen per `COPY CUSTOMER-RECORD` eingebunden
+→ Java: Gemeinsames Record/DTO das alle Services nutzen
+→ **KI-Falle:** KI sieht nur das aktuelle Programm, nicht die Copybooks → explizit mitgeben!
+
+**FILE SECTION (Sequential File I/O):**
+```cobol
+FILE SECTION.
+  FD CUSTOMER-FILE.
+  01 CUSTOMER-REC    PIC X(85).  ← Fixed-Length Record, 85 Bytes
+```
+→ Java: `BufferedReader` mit Fixed-Width-Parsing oder Apache Commons FixedLengthReader
+→ **KI-Falle:** KI migriert auf CSV-Parsing → falsch! COBOL-Dateien haben KEINE Delimiter
+
+**COMP-3 (Packed Decimal) – das unterschätzte Problem:**
+```cobol
+  05 SALARY    PIC 9(7)V99 COMP-3.
+  * Speichert 1234567.89 als: 01 23 45 67 89 0C (BCD + positive sign)
+  * 5 Bytes statt 9 Bytes im Display-Format
+```
+→ Java: `BigDecimal` mit korrekter Scale (immer `.setScale(2, RoundingMode.HALF_UP)`)
+→ **Achtung:** COBOL `ROUNDED` ist nicht immer `HALF_UP` – prüft die COBOL-Doku!
+
+**COBOL ROUNDED vs. Java RoundingMode:**
+```
+COBOL ROUNDED (Standard)     = Java RoundingMode.HALF_UP     (0.5 → 1)
+COBOL ROUNDED MODE NEAREST-EVEN = Java RoundingMode.HALF_EVEN (Banker's Rounding)
+→ Wenn ihr nicht wisst welches: Testet mit bekannten Werten!
+```
 
 ---
 
@@ -332,6 +407,37 @@ Danach:
 3. Führe Tests mental durch
 4. Gib korrigierte finale Implementierung"
 ```
+
+---
+
+### Verifikationsstrategie: Wie prüft man ob die Migration korrekt ist?
+
+**1. Output-Vergleich (Golden File Testing):**
+```
+COBOL-Programm mit Test-Input laufen lassen → Output speichern (= Golden File)
+Java-Programm mit identischem Input laufen lassen → Output vergleichen
+→ Byte-für-Byte muss identisch sein (bei Geldbeträgen: auf 2 Dezimalstellen)
+```
+
+**2. Testdaten-Strategie:**
+```java
+// Aus COBOL-Testfällen ableiten:
+@ParameterizedTest
+@CsvSource({
+    "10000.00, 0.19, 1900.00",        // Normalfall
+    "0.01, 0.19, 0.00",               // Rundung bei Kleinstbeträgen
+    "9999999.99, 0.19, 1899999.9981",  // Maximaler Wert (PIC 9(7)V99)
+    "0.00, 0.19, 0.00",               // Null-Betrag
+})
+void testTaxCalculation(BigDecimal amount, BigDecimal rate, BigDecimal expected) {
+    assertEquals(expected, service.calculateTax(amount, rate));
+}
+```
+
+**3. Grenzwerte die COBOL anders handelt als Java:**
+- Negative Zahlen bei `PIC 9(...)` (unsigned) → Java `int` erlaubt negativ!
+- Überlauf: COBOL schneidet ab, Java wirft Exception
+- Leerzeichen in `PIC X(...)` → Java `null` vs. leerer String vs. Leerzeichen
 
 ---
 

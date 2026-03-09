@@ -204,6 +204,41 @@ Spezialisierte Agents fuer verschiedene Aufgaben. Jeder laeuft isoliert im eigen
 
 ---
 
+## GSD-Workflow (Get Shit Done) — Optional
+
+> GSD ist ein Add-on fuer grosse Projekte. Installation: `npx get-shit-done-cc@latest`
+> Fuer kleine Tasks (Bug Fix, einzelnes Feature) unsere eigenen Commands nutzen.
+
+### Wann GSD statt unserer Commands
+
+| Situation | Empfohlener Workflow |
+|---|---|
+| Bug Fix, kleines Feature (< 5 Dateien) | `/plan` → implementieren → `/review` |
+| Mittleres Feature (5-15 Dateien) | `/swarm` mit Dev + Test + Review Agent |
+| Grosses Feature / Neues Modul (15+ Dateien) | `/gsd:plan-phase` → `/gsd:execute-phase` |
+| Greenfield-Projekt (komplett neu) | `/gsd:new-project` → phasenweise aufbauen |
+| Legacy-Migration (viele Module) | `/gsd:map-codebase` → phasenweise migrieren |
+
+### GSD + unser Setup — Zusammenspiel
+
+GSD erstellt eigene Planungsdateien in `.planning/`. Diese ergaenzen unsere Struktur:
+- **CLAUDE.md** bleibt die Quelle fuer Code-Standards, Tech Stack, Konventionen
+- **Rules** (Java, Vue, SQL) gelten auch fuer GSD-generiertem Code
+- **MEMORY.md** und `tasks/lessons.md` werden weiterhin gepflegt
+- **MCP-Server** stehen auch GSD-Agents zur Verfuegung
+
+### GSD-Session starten
+
+```
+# Bestehendes Projekt analysieren
+/gsd:map-codebase
+
+# Oder neues Projekt aufsetzen
+/gsd:new-project
+```
+
+---
+
 ## Rollen-Kontext
 
 > Je nach Anwender gibt es unterschiedliche Beduerfnisse:

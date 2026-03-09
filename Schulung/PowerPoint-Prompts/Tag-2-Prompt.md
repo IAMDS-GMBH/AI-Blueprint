@@ -1,14 +1,22 @@
 # PowerPoint-Prompt: Tag 2 — KI als Coding-Partner + MCP
 
 ## Anweisung
-Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulung. Der Tag ist zweigeteilt: Vormittag "KI als Coding Assistant" und Nachmittag "MCP-Server bauen". Zielgruppe: 6 Software-Entwickler mit Tag-1-Erfahrung.
+Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulung. Der Tag ist zweigeteilt: Vormittag "KI als Coding Assistant" und Nachmittag "MCP-Server bauen". Zielgruppe: 6 erfahrene Software-Entwickler (Java, Spring Boot, Vue.js, TypeScript) mit Tag-1-Erfahrung.
+
+**WICHTIG — Zielgruppe:** Erfahrene Entwickler. Keine Basics erklären. Stattdessen: Token-Kosten bei Sub-Agents, technische Unterschiede Inline vs. Agent Mode (Context-Größe, Latenz, Kosten), SQL-Injection-Beispiele im MCP-Kontext, Tool-Auswahl-Algorithmus. Mindestens 40% der Folien sollen Code-Beispiele oder technische Diagramme enthalten.
 
 ## Design-Vorgaben
-- Professionell, modern, clean — gleiches Design wie Tag 1
+- Stil inspiriert von iamds.com: modern, clean, viel Weißraum, tech-professional — gleiches Design wie Tag 1
 - Wenig Text pro Folie (max. 5-6 Bulletpoints, kurze Sätze)
 - Große Schrift (min. 24pt Body, 36pt Titel)
+- Schriftart: Open Sans (oder Calibri als Fallback)
 - Diagramme und Tabellen wo möglich
-- Farbschema: Dunkelblau (#1a365d), helles Grau (#f7fafc), Akzent Orange (#ed8936)
+- Farbschema:
+  - Primärfarbe: Deep Blue (#3f59ff) — für Überschriften, Buttons, Highlights
+  - Sekundärfarbe: Navy (#212b80) — für Titel, dunkle Hintergründe
+  - Akzentfarbe: Golden Yellow (#ffd440) — für Hervorhebungen, Call-to-Actions
+  - Hintergrund: Weiß (#ffffff) mit viel Weißraum
+  - Text: Dunkelgrau (#212121)
 - Sprache: Deutsch
 
 ## Folienstruktur (33 Folien)
@@ -47,15 +55,19 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
 - Workflow (3 Schritte): KI macht Fehler → Lesson aufschreiben → KI liest beim nächsten Start
 - Kernaussage: "Jeder korrigierte Fehler gehört in lessons.md"
 
-### Folie 6: Copilot — Inline vs. Agent Mode
-- Zwei Spalten:
-  - Inline: Während du tippst, bekannte Patterns, schnell, kein Prompt nötig
-  - Agent Mode: Neue Features, Refactoring, mehrere Dateien, braucht guten Prompt
-- Faustregel: "Inline = ich weiß was ich will. Agent = ich beschreibe ein Ziel."
+### Folie 6: Copilot — Inline vs. Agent Mode (technisch)
+- Vergleichstabelle mit technischen Details:
+  | | Inline | Agent Mode |
+  | Context | Nur aktuelle Datei (~2-5 Dateien) | Gesamtes Workspace |
+  | Latenz | 50-200ms | 2-15 Sekunden |
+  | Token-Kosten | ~100-500 pro Completion | ~5.000-50.000 pro Anfrage |
+  | Instructions | Nicht geladen | copilot-instructions.md geladen |
+- Entscheidungsbaum: Vervollständigung? → Inline. Mehrere Dateien? → Agent. Konventionen nötig? → Agent.
 
 ### Folie 7: Sub-Agents — Kontext sauber halten
-- Diagramm: Hauptkontext → Sub-Agent (Recherche) → Ergebnis zurück → Hauptkontext weiter
-- Wann: Recherche, parallele Tasks, große Log-Analysen
+- Diagramm: Hauptkontext (30% belegt) → Sub-Agent (neues 200k Window, 0% belegt) → Ergebnis zurück
+- Kosten-Box: "5 parallele Agents = 5x Token-Kosten, ABER alle laufen gleichzeitig"
+- Wann lohnt es sich vs. sequentiell arbeiten
 - Warnsignale für vollen Kontext: Wiederholte Fragen, ignorierte Constraints, Stil-Abweichungen
 
 ### Folie 8: Context-Window-Management
@@ -73,7 +85,7 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
   | /loop | Wiederkehrende Tasks (z.B. /loop 5m /review) |
   | /ralph | Iterativer Selbst-Verifikations-Loop |
 
-### Folie 10: /ralph — Qualitäts-Firewall
+### Folie 10: /ralph — Qualitäts-Firewall (mit echtem Output)
 - 6-Punkte-Checkliste als Grafik:
   1. Vollständig? (alle Requirements)
   2. Korrekt? (syntaktisch + logisch)
@@ -81,7 +93,8 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
   4. Sicher? (keine Security-Lücken)
   5. Minimal? (nichts außerhalb Scope)
   6. Elegant? (Staff-Engineer-Standard)
-- "Was fehlschlägt wird sofort gefixt"
+- Beispiel-Output: "✅ Vollständig: 3 Endpoints ✅ Korrekt: Tests grün ⚠️ Konventionen: Interface fehlt → FIX"
+- Warnung: "/ralph kann selbst halluzinieren — nach /ralph immer mvn test laufen lassen"
 
 ### Folie 11: KI autonom arbeiten lassen
 - 3 Patterns:
@@ -115,22 +128,32 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
 - Titel: "MCP — KI mit der Außenwelt verbinden"
 - Untertitel: "Model Context Protocol"
 
-### Folie 16: Das Problem — KI spricht kein REST
+### Folie 16: Warum MCP besser ist als REST für KI (technisch)
 - Vergleichstabelle:
-  | Aspekt | REST API | Was KI braucht |
-  | Dokumentation | OpenAPI (formal) | Natürlichsprachige Beschreibung |
-  | Fehler | HTTP-Statuscodes | Erklärung was schiefging |
-  | Discovery | Manuell lesen | Automatisch verstehen |
-  | Kontext | Request/Response | "Was bedeutet dieses Ergebnis?" |
+  | Aspekt | REST + Tool Use | MCP |
+  | Tool-Discovery | Manuell in JSON definieren | Server liefert automatisch |
+  | Schema-Inference | JSON Schema pro Endpoint schreiben | Server deklariert Parameter + Typen |
+  | Fehlerbehandlung | HTTP-Codes interpretieren | Standardisiertes Error-Format |
+  | Transport | HTTP/HTTPS | stdio (lokal) oder HTTP |
+  | Multi-Client | Pro Client neu integrieren | Einmal bauen → überall nutzen |
+- Kernaussage: "REST geht auch (Tool Use API). MCP ist der Standard dafür."
 
-### Folie 17: Was ist MCP?
-- Große Grafik mit USB-Analogie:
-  - "MCP ist wie ein USB-Standard für KI-Tools"
-  - Ohne MCP: KI ← Text → Du ← API → System
-  - Mit MCP: KI ← MCP → System (direkt, mit Kontext)
-- "Einmal schreiben, überall nutzen (Claude Code, Copilot, etc.)"
+### Folie 17: Wie ein MCP-Tool-Call technisch abläuft
+- Sequenz-Diagramm (5 Schritte):
+  1. Claude Code startet MCP-Server als Child-Process (stdio)
+  2. Server schickt Tool-Liste (name, description, inputSchema)
+  3. Claude matched User-Prompt gegen Tool-Descriptions → wählt passendes Tool
+  4. Claude sendet Tool-Call mit Argumenten → Server führt aus
+  5. Server antwortet → Claude formuliert Antwort
+- Box: "Die description ist ein Prompt an die KI — schlechte Description = falsches Tool"
 
-### Folie 18: Anatomie eines MCP-Servers
+### Folie 18: Tool-Descriptions — Schlecht vs. Gut
+- Zwei Code-Blöcke:
+  - ❌ Schlecht: `{ name: "get-data", description: "Holt Daten aus der DB" }` — zu vage
+  - ✅ Gut: `{ name: "list-tables", description: "Listet alle Tabellennamen auf. Nutze als ERSTEN Schritt um verfügbare Daten zu verstehen." }`
+- Token-Kosten-Box: "4 Tools × 200 Tokens = 800 Tokens pro Nachricht nur für Definitionen"
+
+### Folie 19: Anatomie eines MCP-Servers
 - 3-Spalten-Grafik:
   - Tools (Aktionen): Was KI tun kann (z.B. get-user, execute-query)
   - Resources (Daten): Was KI lesen kann (z.B. db://schema)
@@ -156,13 +179,16 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
   - Ebene 2: DB-Berechtigungen (Read-Only User)
   - Ebene 3: Tool-Level Authorization (Admin-Only für delete)
 
-### Folie 22: Sicherheitsregeln für MCP
-- Checklist-Grafik:
-  - Keine DB-Passwörter im Code — nur Umgebungsvariablen
-  - Minimale DB-Rechte (Principle of Least Privilege)
-  - Parameterized Queries (kein String-Concat!)
-  - Sensible Daten nie über MCP exponieren
-  - Rate Limiting für Tool-Calls
+### Folie 22: SQL-Injection im MCP-Kontext (Code-Beispiel)
+- Zwei Code-Blöcke:
+  - ❌ UNSICHER: `SELECT * FROM ${tableName} WHERE ${whereClause}` — KI könnte `1=1; DROP TABLE` generieren
+  - ✅ SICHER: Tabellen-Whitelist + Parameterized Queries + Regex-Validierung für WHERE
+- Checklist:
+  - Tabellen-Whitelist (nur erlaubte Tabellen)
+  - Parameterized Queries (keine String-Interpolation)
+  - Sensible Spalten filtern (PASSWORD, SECRET, API_KEY)
+  - Rate Limiting: Max. 10 Tool-Calls/Minute
+  - Logging: Tool-Calls loggen, KEINE Query-Parameter (Datenschutz)
 
 ### Folie 23: Security-Checklist für KI im Unternehmen (NEU)
 - 8-Punkte-Checklist:

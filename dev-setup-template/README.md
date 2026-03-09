@@ -166,6 +166,57 @@ Plugins werden in `.claude/settings.json` gespeichert und bleiben bei `--update`
 
 ---
 
+## GSD (Get Shit Done) — Optionales Add-on
+
+GSD ist ein Spec-Driven-Development-System fuer Claude Code. Es loest das Problem von **Context Rot**
+(Qualitaetsverlust bei langen Sessions) durch atomare Plaene die jeweils in einem frischen Context-Window laufen.
+
+**Wann GSD nutzen:**
+- Grosse Features (10+ Dateien, mehrere Tage Arbeit)
+- Greenfield-Projekte (neues Repo von Null aufbauen)
+- Komplexe Migrationen mit vielen Modulen
+
+**Wann NICHT:**
+- Kleine Bug-Fixes, einzelne Features (unsere `/plan` + `/review` Commands reichen)
+- Ad-hoc-Fragen und Exploration
+
+### Installation (einmalig)
+
+```bash
+npx get-shit-done-cc@latest
+# → Waehle "Claude Code" + "Local" (pro Projekt) oder "Global" (alle Projekte)
+```
+
+Verifizieren: In Claude Code `/gsd:help` ausfuehren.
+
+### Wie GSD unser Setup ergaenzt
+
+| Ebene | dev-setup-template | GSD |
+|---|---|---|
+| Projekt-Kontext | CLAUDE.md, MEMORY.md | PROJECT.md, STATE.md |
+| Code-Standards | Rules (Java, Vue, SQL) | — |
+| Agents | Dev, Test, Review, Docs | 12 spezialisierte Agents |
+| Workflow (klein) | /plan, /review, /ralph | — |
+| Workflow (gross) | /swarm | /gsd:plan-phase, /gsd:execute-phase |
+| MCP-Server | Playwright, GitHub, Oracle | — |
+| Context-Management | — | Frischer Context pro Task |
+
+**Empfehlung:** Fuer den Alltag unsere Commands nutzen. Fuer grosse Projekte GSD aktivieren.
+
+### GSD-Kernbefehle
+
+```
+/gsd:new-project        — Neues Projekt initialisieren (Research + Roadmap)
+/gsd:map-codebase       — Bestehendes Projekt analysieren
+/gsd:plan-phase N       — Phase N planen (atomare Task-Plaene)
+/gsd:execute-phase N    — Phase N ausfuehren (parallele Waves, frischer Context)
+/gsd:verify-work N      — Ergebnisse verifizieren
+/gsd:quick              — Ad-hoc Tasks ohne vollen Overhead
+/gsd:pause-work         — Session unterbrechen + spaeter fortsetzen
+```
+
+---
+
 ## Weiterentwicklung
 
 Neue Erkenntnisse → `tasks/lessons.md`

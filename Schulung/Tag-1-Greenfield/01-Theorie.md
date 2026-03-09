@@ -18,33 +18,64 @@ Bevor wir anfangen: Was macht KI eigentlich unter der Haube? Ihr müsst kein Mat
 
 **LLM = Large Language Model**
 
+### Wie ein LLM technisch arbeitet
+
 ```
-Vereinfacht gesagt:
-Ein LLM hat extrem viel Text gelesen (das halbe Internet, Bücher, Code)
-und gelernt: "Nach diesem Text kommt mit hoher Wahrscheinlichkeit dieser Text."
+1. Tokenization (BPE – Byte Pair Encoding):
+   Euer Prompt wird in Tokens zerlegt – NICHT in Wörter.
+   "getUserById" = 3 Tokens: ["get", "User", "ById"]
+   "System.out.println" = 4 Tokens
+   → Warum relevant: Token-Limits, Kosten, und warum CamelCase-Code mehr kostet als snake_case
 
-Wenn ihr einen Prompt schreibt → KI sagt voraus was als nächstes sinnvoll ist.
+2. Transformer + Attention:
+   Das Modell berechnet für jedes Token die Wahrscheinlichkeit des nächsten Tokens.
+   "Attention" = welche vorherigen Tokens sind für die Vorhersage relevant?
+   Bei Code: Attention auf Import-Statements → generiert passende Methoden-Aufrufe.
+
+3. Sampling (Temperature / Top-P):
+   Temperature 0.0 = deterministisch (immer der wahrscheinlichste Token) → gut für Code
+   Temperature 0.7 = kreativer (mehr Variation) → gut für Brainstorming, Architektur-Alternativen
+   → Claude Code nutzt standardmäßig niedrige Temperature für Code-Generierung
 ```
 
-**Was das bedeutet in der Praxis:**
+**Token-Kosten – was das konkret bedeutet:**
 
-| Eigenschaft | Was das heißt für euch |
+| Modell | Input | Output | Context Window | 1 Feature (~2000 Tokens) |
+|--------|-------|--------|----------------|--------------------------|
+| Claude Sonnet 4 | $3/1M Tokens | $15/1M Tokens | 200k Tokens | ~$0.03 Input + $0.15 Output |
+| Claude Opus 4 | $15/1M Tokens | $75/1M Tokens | 200k Tokens | ~$0.15 Input + $0.75 Output |
+| GPT-4o | $2.50/1M Tokens | $10/1M Tokens | 128k Tokens | ~$0.025 Input + $0.10 Output |
+
+→ Context Window 200k Tokens ≈ 500 Seiten Code. Aber: Je voller das Window, desto schlechter die Qualität (Context Rot).
+
+**Was das in der Praxis bedeutet:**
+
+| Eigenschaft | Technische Erklärung |
 |---|---|
-| KI ist kein Datenbank-Lookup | Sie erfindet Antworten – auch wenn sie falsch sind ("Halluzination") |
-| KI hat ein Kontextfenster | Sie "sieht" nur was im aktuellen Chat steht, nicht euer ganzes Repo |
-| Prompt-Qualität = Output-Qualität | Je präziser die Eingabe, desto besser das Ergebnis |
-| KI kennt keine "Wahrheit" | Sie antwortet überzeugend auch wenn sie falsch liegt |
+| Halluzination | Modell hat hohe Confidence für falschen Token – es gibt kein internes "ich weiß es nicht" |
+| Kontextfenster | Sliding Window über alle bisherigen Nachrichten im Chat – ältere Nachrichten werden komprimiert oder abgeschnitten |
+| Prompt-Qualität = Output-Qualität | Präzisere Tokens → schmalere Wahrscheinlichkeitsverteilung → deterministischeres Ergebnis |
+| Kein Zustandsspeicher | Jeder API-Call ist stateless – der gesamte Chat wird jedes Mal neu gesendet |
 
-**Warum halluziniert KI?**
+### Warum halluziniert KI – die 3 häufigsten Fälle für Entwickler
+
 ```
-KI sagt nicht "ich weiß es nicht" – sie sagt die wahrscheinlichste Antwort.
-Wenn sie keine gute Antwort kennt: erfindet sie eine die plausibel klingt.
+1. Nicht-existierende API-Methoden:
+   KI generiert: repository.findByNameContainingIgnoreCase(name)
+   → Methode existiert nur wenn Spring Data Query Derivation korrekt konfiguriert ist
+   → KI kennt das Pattern, aber nicht EUER Repository
 
-→ Deshalb: Nie blind vertrauen. Immer verifizieren.
+2. Falsche Library-Versionen:
+   KI generiert Spring Boot 2 Syntax: WebSecurityConfigurerAdapter
+   → In Spring Boot 3.x entfernt – SecurityFilterChain stattdessen
+   → KI wurde auf Code trainiert der beides enthält
+
+3. Erfundene CLI-Flags / Konfiguration:
+   KI schlägt vor: mvn spring-boot:run --debug-port=5005
+   → Flag existiert nicht so – korrekt wäre: -Dspring-boot.run.jvmArguments="-agentlib:jdwp=..."
 ```
 
-**Die wichtigste Konsequenz:**
-KI ist kein Orakel das ihr glauben müsst – sie ist ein sehr schneller Erstentwurf-Generator den ihr prüfen und korrigieren müsst.
+**→ Konsequenz:** KI ist kein Orakel – sie ist ein statistischer Code-Generator. Output immer gegen Compiler, Tests und Docs verifizieren.
 
 ---
 
@@ -185,20 +216,71 @@ Constraints: [Was darf NICHT passieren?]
 Format:      [Wie soll das Ergebnis aussehen?]
 ```
 
-### KERNEL in der Praxis
+### KERNEL in der Praxis – Vorher/Nachher mit echtem Output
 
-**Vorher (vage):**
+**Prompt OHNE KERNEL:**
 > "Hilf mir eine Spring-Applikation zu bauen"
-→ Ergebnis: Generisches Hello-World, nicht nutzbar
 
-**Nachher (KERNEL):**
+**Was die KI generiert:**
+```java
+// Generisches Hello-World – nicht nutzbar
+@RestController
+public class HelloController {
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello World!";
+    }
+}
+// → Kein Service-Layer, keine Validierung, kein DTO, kein Error-Handling
 ```
-Context:     Java Spring Boot 3.2 Projekt, PostgreSQL, Maven
+
+**Prompt MIT KERNEL:**
+```
+Context:     Java 17, Spring Boot 3.2, PostgreSQL, Maven. Service-Interface-Pattern.
 Task:        POST /api/v1/users – User registrieren (Name, E-Mail, Passwort)
-Constraints: Service-Interface Pattern, DTO für Input/Output, Passwort mit BCrypt hashen
-Format:      Nur die nötigen Klassen, kein Boilerplate
+Constraints: DTO für Input/Output, Passwort mit BCrypt hashen, @Valid + Bean Validation,
+             Exception via @RestControllerAdvice, kein @Autowired (Constructor Injection)
+Format:      UserController, UserService (Interface + Impl), CreateUserRequest DTO, UserResponse DTO
 ```
-→ Ergebnis: Direkt nutzbarer Code beim ersten Versuch
+
+**Was die KI generiert:**
+```java
+// Controller mit Validierung + korrektem HTTP-Status
+@RestController
+@RequestMapping("/api/v1/users")
+@RequiredArgsConstructor
+public class UserController {
+    private final UserService userService;
+
+    @PostMapping
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(userService.createUser(request));
+    }
+}
+
+// Service mit BCrypt + Interface-Pattern
+@Service
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public UserResponse createUser(CreateUserRequest request) {
+        if (userRepository.existsByEmail(request.email())) {
+            throw new ConflictException("E-Mail bereits vergeben");
+        }
+        User user = User.builder()
+            .name(request.name())
+            .email(request.email())
+            .password(passwordEncoder.encode(request.password()))
+            .build();
+        return UserResponse.from(userRepository.save(user));
+    }
+}
+```
+→ **Direkt nutzbarer Produktionscode beim ersten Versuch.** Das ist der Unterschied den KERNEL macht.
 
 ### Erweiterte Prompting-Techniken (Anthropic Best Practices)
 
@@ -596,6 +678,38 @@ Welche tatsächlich existierende Alternative erreichst du dasselbe Ziel?"
 ```
 
 **Goldene Regel:** Jeder korrigierte Fehler gehört in `tasks/lessons.md` – damit die KI ihn beim nächsten Mal nicht wiederholt.
+
+---
+
+## 9. Context-Window-Management – wann die KI schlechter wird
+
+**Das Problem:** Je länger ein Chat läuft, desto voller wird das Context Window. Ab ~60-70% Auslastung sinkt die Qualität merklich – das nennt man **Context Rot**.
+
+**Was technisch passiert:**
+```
+Neuer Chat:     [System-Prompt + CLAUDE.md + MEMORY.md] = ~5% belegt → 95% für eure Aufgabe
+Nach 30 Min:    [System + History + Code-Diffs + Tool-Outputs] = ~40% belegt → noch gut
+Nach 2 Stunden: [Alles von oben + komprimierte alte Nachrichten] = ~70% belegt → Qualität sinkt
+Voll:           Claude komprimiert automatisch – ältere Nachrichten werden zusammengefasst
+                → Details gehen verloren, KI "vergisst" frühere Entscheidungen
+```
+
+**Woran ihr Context Rot erkennt:**
+- KI wiederholt Fehler die ihr schon korrigiert habt
+- KI vergisst Konventionen aus CLAUDE.md
+- KI generiert generischeren Code als am Anfang
+- Antworten werden langsamer (mehr Tokens zu verarbeiten)
+
+**Strategien:**
+
+| Situation | Strategie |
+|---|---|
+| Feature fertig, nächstes anfangen | **Neuen Chat starten** – frischer Context |
+| Mitten im Feature, aber Context voll | `/compact` zum manuellen Komprimieren, dann weiter |
+| Großes Feature (20+ Dateien) | Von Anfang an **Sub-Agents** nutzen (jeder hat eigenen Context) |
+| KI dreht sich im Kreis | Chat schließen, neuen Chat: "Lies [Datei X] und fixe [konkretes Problem]" |
+
+**Faustregel:** Ein Chat = ein Feature. Danach neuer Chat.
 
 ---
 

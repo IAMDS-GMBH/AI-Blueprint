@@ -1,14 +1,22 @@
 # PowerPoint-Prompt: Tag 3 — Code-Modernisierung & COBOL-Migration
 
 ## Anweisung
-Erstelle eine professionelle PowerPoint-Präsentation für Tag 3 einer KI-Schulung. Thema: Legacy-Code-Modernisierung und COBOL-Migration mit KI. Der Tag besteht aus Theorie (Vormittag), Warm-up mit synthetischen COBOL-Beispielen und einer Hauptübung mit echtem Unternehmens-COBOL. Zielgruppe: 6 Software-Entwickler.
+Erstelle eine professionelle PowerPoint-Präsentation für Tag 3 einer KI-Schulung. Thema: Legacy-Code-Modernisierung und COBOL-Migration mit KI. Der Tag besteht aus Theorie (Vormittag), Warm-up mit synthetischen COBOL-Beispielen und einer Hauptübung mit echtem Unternehmens-COBOL. Zielgruppe: 6 erfahrene Software-Entwickler (Java, Spring Boot) die COBOL-Systeme migrieren sollen.
+
+**WICHTIG — Zielgruppe:** Erfahrene Entwickler. Code-Beispiele sollen produktionsreif sein (mit Error-Handling, @Transactional, Audit-Logging). COBOL-Grundlagen technisch erklären (COMP-3, Copybooks, FILE-SECTION). Mindestens 40% der Folien sollen Code-Beispiele oder technische Diagramme enthalten.
 
 ## Design-Vorgaben
-- Professionell, modern, clean — gleiches Design wie Tag 1 und 2
+- Stil inspiriert von iamds.com: modern, clean, viel Weißraum, tech-professional — gleiches Design wie Tag 1 und 2
 - Wenig Text pro Folie (max. 5-6 Bulletpoints)
 - Große Schrift (min. 24pt Body, 36pt Titel)
+- Schriftart: Open Sans (oder Calibri als Fallback)
 - Diagramme und Tabellen bevorzugen
-- Farbschema: Dunkelblau (#1a365d), helles Grau (#f7fafc), Akzent Orange (#ed8936)
+- Farbschema:
+  - Primärfarbe: Deep Blue (#3f59ff) — für Überschriften, Buttons, Highlights
+  - Sekundärfarbe: Navy (#212b80) — für Titel, dunkle Hintergründe
+  - Akzentfarbe: Golden Yellow (#ffd440) — für Hervorhebungen, Call-to-Actions
+  - Hintergrund: Weiß (#ffffff) mit viel Weißraum
+  - Text: Dunkelgrau (#212121)
 - Sprache: Deutsch
 
 ## Folienstruktur (30 Folien)
@@ -55,11 +63,12 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 3 einer KI-Schulu
   2. Tech-Stack-Modernisierung: COBOL/C/VB6 → Java/Python/TypeScript
   3. Entwicklungspraxis-Evolution: Wasserfall → CI/CD, manuell → automatisiert
 
-### Folie 8: Praxis-Beispiel A — C → Java
-- Zwei Code-Blöcke nebeneinander (vereinfacht):
+### Folie 8: Praxis-Beispiel A — C → Java (produktionsreif)
+- Zwei Code-Blöcke nebeneinander:
   - Links: C-Struct mit double claim_amount (FEHLER markiert)
-  - Rechts: Java mit BigDecimal claimAmount (FIX markiert)
-- Was KI geleistet hat: double→BigDecimal erkannt, char→Enum, Events ergänzt
+  - Rechts: Java mit BigDecimal, @Transactional, Exception-Handling, Audit-Logging
+- Was KI geleistet hat: double→BigDecimal, char→Enum, Events ergänzt
+- Box: "KI generiert Happy Path gut. Error Handling + Audit müsst ihr explizit anfordern."
 
 ### Folie 9: Praxis-Beispiel B — Shell/FTP → REST API
 - Zwei Boxen:
@@ -102,16 +111,24 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 3 einer KI-Schulu
   - IDENTIFICATION DIVISION → Programm-Metadaten
   - DATA DIVISION → Variablen (wie Struct)
   - PROCEDURE DIVISION → Business-Logik (wie main())
-- Kleines Code-Beispiel (5 Zeilen COBOL)
+- Code-Beispiel: COBOL Record mit PIC-Klauseln (5 Zeilen)
 
-### Folie 15: COBOL → Java Fallen
+### Folie 15: COBOL → Java Fallen (erweitert)
 - Tabelle:
   | COBOL | Java | Falle! |
-  | PIC 9(5) | int | Führende Nullen verloren |
+  | PIC 9(5) | int | Führende Nullen verloren (PLZ "01234") |
   | PIC 9(7)V99 | BigDecimal | NIEMALS double! |
-  | PIC X(30) | String | COBOL paddet mit Leerzeichen |
-  | Level-Numbers | Verschachtelte Klassen | Oft mehrere Ebenen tief |
-  | PERFORM UNTIL | while-Schleife | NICHT for-each |
+  | PIC X(30) | String.trim() | COBOL paddet mit Leerzeichen |
+  | COMP-3 (Packed Decimal) | BigDecimal | BCD-Format: 2 Ziffern/Byte + Sign-Nibble |
+  | COPYBOOKS (.CPY) | Shared DTO/Record | Wie C-Header: in mehreren Programmen eingebunden |
+  | FILE SECTION | BufferedReader | Fixed-Width! KEINE Delimiter (kein CSV!) |
+  | SIGN IS SEPARATE | Vorzeichen-Handling | +/- als eigenes Zeichen gespeichert |
+
+### Folie 15b: COBOL ROUNDED vs. Java RoundingMode
+- Vergleich:
+  - COBOL ROUNDED (Standard) = Java RoundingMode.HALF_UP (0.5 → 1)
+  - COBOL ROUNDED MODE NEAREST-EVEN = Java RoundingMode.HALF_EVEN (Banker's Rounding)
+- Kernaussage: "Wenn ihr nicht wisst welches → Testet mit bekannten Werten!"
 
 ### Folie 16: Migrations-Workflow mit KI
 - 5-Schritte-Diagramm (horizontal):
@@ -131,6 +148,13 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 3 einer KI-Schulu
   | Tests | Claude Code Test Agent |
   | Verifikation | Chain-of-Verification |
   | Große Migration | /swarm |
+
+### Folie 17b: Verifikationsstrategie — Ist die Migration korrekt?
+- 3 Schritte:
+  1. Golden File Testing: COBOL mit Test-Input → Output speichern → Java mit gleichem Input → vergleichen
+  2. Testdaten-Strategie: @ParameterizedTest mit Normalfall, Rundung, Maximalwert, Null (Code-Beispiel)
+  3. Grenzwerte die COBOL anders handelt: Negative Zahlen (unsigned PIC), Überlauf (COBOL schneidet ab, Java Exception), Leerzeichen vs. null
+- Kernaussage: "Byte-für-Byte identisch bei Geldbeträgen"
 
 ### Folie 18: Strangler Fig Pattern
 - Diagramm (4 Phasen):
