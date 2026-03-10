@@ -48,6 +48,9 @@ Erstelle eine professionelle PowerPoint-Präsentation für einen Schulungstag zu
   | Claude Sonnet 4 | $3 | $15 | 200k | ~$0.18 |
   | Claude Opus 4 | $15 | $75 | 200k | ~$0.90 |
   | GPT-4o | $2.50 | $10 | 128k | ~$0.13 |
+  | Devstral 2 (Mistral) | GRATIS | GRATIS | 256k | Aktuell kostenlos |
+  | Codestral (Mistral) | €0.30 | €0.90 | 256k | ~€0.01 |
+  | Mistral Large | €2 | €6 | 128k | ~€0.08 |
 - Kernaussage: "200k Tokens ≈ 500 Seiten Code. Aber: Je voller, desto schlechter (Context Rot)."
 
 ### Folie 5: 3 typische Code-Halluzinationen
@@ -136,13 +139,16 @@ Erstelle eine professionelle PowerPoint-Präsentation für einen Schulungstag zu
   3. XML-Tags für komplexe Prompts
   4. Schrittweise denken lassen
 
-### Folie 19: Tool-Vergleich — Claude Code vs. GitHub Copilot
+### Folie 19: Tool-Vergleich — Claude Code vs. Mistral Vibe vs. Copilot
 - Vergleichstabelle:
-  | Merkmal | Claude Code | GitHub Copilot |
-  | Stärke | Autonome Agents, Plan Mode, Swarms | Inline-Autocomplete, IDE-Integration |
-  | Wann nutzen | Große Features, Refactoring | Tägliches Coding, Vervollständigung |
-  | CLI-Native | Ja (Terminal) | Nein (nur IDE) |
-  | Kosten | Usage-based oder $100/Mo flat | $10-39/Mo |
+  | Merkmal | Claude Code | Mistral Vibe | GitHub Copilot |
+  | Typ | CLI-Agent | CLI-Agent | IDE-Plugin |
+  | Stärke | CLAUDE.md, Rules, Skills, Swarms | Open Source, Devstral 2 GRATIS | Inline-Autocomplete |
+  | Wann nutzen | Große Features, Refactoring | Kostenbewusst, Open-Source-Präferenz | Tägliches Coding |
+  | Config | CLAUDE.md + .claude/ | .vibe/config.toml + AGENTS.md | copilot-instructions.md |
+  | Kosten | Usage-based oder $100/Mo flat | GRATIS (Devstral 2) / Teams €25/Mo | $10-39/Mo |
+  | MCP | .mcp.json | [[mcp_servers]] in config.toml | .vscode/mcp.json |
+- Kernaussage: "Nicht dogmatisch — je nach Task das bessere Tool nehmen. Alle drei können parallel laufen."
 
 ### Folie 20: CLAUDE.md — Projektkontext geben
 - Beispiel einer CLAUDE.md (vereinfacht, 5 Zeilen)

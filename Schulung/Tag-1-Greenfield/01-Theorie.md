@@ -45,6 +45,9 @@ Bevor wir anfangen: Was macht KI eigentlich unter der Haube? Ihr müsst kein Mat
 | Claude Sonnet 4 | $3/1M Tokens | $15/1M Tokens | 200k Tokens | ~$0.03 Input + $0.15 Output |
 | Claude Opus 4 | $15/1M Tokens | $75/1M Tokens | 200k Tokens | ~$0.15 Input + $0.75 Output |
 | GPT-4o | $2.50/1M Tokens | $10/1M Tokens | 128k Tokens | ~$0.025 Input + $0.10 Output |
+| Devstral 2 (Mistral) | GRATIS | GRATIS | 256k Tokens | Aktuell kostenlos via Mistral API |
+| Codestral (Mistral) | €0.30/1M Tokens | €0.90/1M Tokens | 256k Tokens | ~€0.003 Input + €0.009 Output |
+| Mistral Large | €2/1M Tokens | €6/1M Tokens | 128k Tokens | ~€0.02 Input + €0.06 Output |
 
 → Context Window 200k Tokens ≈ 500 Seiten Code. Aber: Je voller das Window, desto schlechter die Qualität (Context Rot).
 

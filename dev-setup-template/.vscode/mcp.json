@@ -15,12 +15,6 @@
       },
       "description": "GitHub Integration – PRs, Issues, Repos"
     },
-    "drawio": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "drawio-mcp-server"],
-      "description": "Architektur-Diagramme automatisch generieren"
-    },
     "figma": {
       "type": "stdio",
       "command": "npx",

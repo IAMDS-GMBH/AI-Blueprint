@@ -13,11 +13,6 @@
       },
       "description": "GitHub Integration – PRs, Issues, Repos direkt aus dem Agent heraus"
     },
-    "drawio": {
-      "command": "npx",
-      "args": ["-y", "drawio-mcp-server"],
-      "description": "Architektur-Diagramme und Flowcharts automatisch generieren lassen"
-    },
     "figma": {
       "command": "npx",
       "args": ["-y", "figma-mcp-server"],

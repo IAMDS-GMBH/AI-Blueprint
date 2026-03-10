@@ -67,6 +67,29 @@ export ANTHROPIC_API_KEY=sk-ant-...
 # GitHub Copilot: VS Code → Extensions → GitHub Copilot → Sign in
 ```
 
+### Mistral Vibe + Teams Setup (OPTIONAL)
+
+> Nur relevant falls Teilnehmer Mistral Teams Lizenzen haben.
+
+```bash
+# Mistral Vibe CLI installieren
+curl -LsSf https://mistral.ai/vibe/install.sh | bash
+
+# API Key setzen (aus console.mistral.ai)
+export MISTRAL_API_KEY=your-key-here
+
+# Testen
+vibe --version
+
+# Continue.dev Extension in VS Code installieren
+# → Extensions → "Continue" suchen → installieren
+# → Continue Config: Codestral als Autocomplete-Modell eintragen
+```
+
+**Le Chat testen:** [chat.mistral.ai](https://chat.mistral.ai) öffnen → mit Teams-Account einloggen → MCP-Server verbinden (Remote SSE)
+
+**Devstral Small 2 lokal (optional):** `ollama pull devstral-small` für datenschutzkritische Szenarien.
+
 ---
 
 ## Verteilung des Schulungsmaterials
@@ -263,6 +286,8 @@ psql -h localhost -p 5432 -U schulung_user -d schulungdb
 | KI antwortet auf Englisch | Prompt auf Deutsch + "Antworte immer auf Deutsch" in CLAUDE.md |
 | setup.sh läuft nicht | `chmod +x dev-setup-template/setup.sh` oder direkt `bash setup.sh` |
 | ANTHROPIC_API_KEY nicht gesetzt | `export ANTHROPIC_API_KEY=sk-ant-...` im Terminal |
+| MISTRAL_API_KEY nicht gesetzt | `export MISTRAL_API_KEY=...` im Terminal (aus console.mistral.ai) |
+| Vibe CLI nicht gefunden | `curl -LsSf https://mistral.ai/vibe/install.sh \| bash` erneut ausfuehren |
 | CORS-Fehler Frontend→Backend | `WebMvcConfig` mit `localhost:5173` allowedOrigins prüfen |
 | pg Verbindung schlägt fehl | PostgreSQL Host/Port/Credentials in `.env` prüfen |
 | MCP-Server antwortet nicht | `.mcp.json` prüfen, Port-Konflikte, Server-Logs |

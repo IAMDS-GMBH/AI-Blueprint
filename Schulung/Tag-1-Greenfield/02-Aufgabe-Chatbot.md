@@ -100,6 +100,23 @@ localhost:5173 erlaubt (Vue.js Frontend)
 ```
 > Den Rest von CLAUDE.md (Tech Stack, Konventionen, etc.) lasst ihr – der kommt vom dev-setup-template und passt bereits.
 
+> **Variante B: Mistral API (falls euer Team Mistral Teams hat)**
+>
+> Wenn ihr Mistral Teams Lizenzen habt, könnt ihr statt der Claude API auch die Mistral API verwenden:
+> ```markdown
+> ## Externe LLM API
+> Provider: Mistral AI
+> URL: https://api.mistral.ai/v1/chat/completions
+> API-Key: aus @Value("${mistral.api-key}"), NIE hardcodiert
+> ```
+> Wichtig: Mistral nutzt das OpenAI-kompatible Format (messages array).
+> In `application.properties`:
+> ```
+> mistral.api-key=${MISTRAL_API_KEY}
+> ```
+> Die API-Aufrufe unterscheiden sich leicht (OpenAI-Format statt Anthropic-Format).
+> Fragt bei der Implementierung den KI-Assistenten nach dem korrekten Mistral-API-Format.
+
 **Spring Boot Projekt erstellen (Claude Code):**
 ```bash
 claude

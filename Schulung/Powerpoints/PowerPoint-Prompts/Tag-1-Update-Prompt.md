@@ -39,6 +39,9 @@ Falls die Folie noch generische LLM-Eigenschaften zeigt, ersetze durch:
   | Claude Sonnet 4 | $3 | $15 | 200k | ~$0.18 |
   | Claude Opus 4 | $15 | $75 | 200k | ~$0.90 |
   | GPT-4o | $2.50 | $10 | 128k | ~$0.13 |
+  | Devstral 2 (Mistral) | GRATIS | GRATIS | 256k | Aktuell kostenlos |
+  | Codestral (Mistral) | €0.30 | €0.90 | 256k | ~€0.01 |
+  | Mistral Large | €2 | €6 | 128k | ~€0.08 |
 - Kernaussage: "200k Tokens ≈ 500 Seiten Code. Je voller, desto schlechter (Context Rot)."
 
 ### Folie 5: "3 typische Code-Halluzinationen" (ERSETZEN falls noch alte Version)
@@ -72,5 +75,6 @@ Falls diese Folie noch nicht existiert, füge sie vor der Zusammenfassung ein:
   1. LLMs sind Wahrscheinlichkeits-Maschinen — immer verifizieren
   2. Entwickler = Problem Solver, KI = Umsetzer
   3. KERNEL-Framework für systematisch bessere Prompts
-  4. CLAUDE.md + MEMORY.md = KI kennt euer Projekt
+  4. CLAUDE.md + MEMORY.md = KI kennt euer Projekt (Mistral Vibe: .vibe/config.toml + AGENTS.md)
   5. Plan Mode → Implementierung → Verifikation → Lessons Learned
+  6. Claude Code + Mistral Vibe + Copilot können parallel im selben Projekt laufen

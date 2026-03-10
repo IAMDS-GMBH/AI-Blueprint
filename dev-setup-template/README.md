@@ -1,7 +1,7 @@
 # AI Workspace Setup – [COMPANY NAME]
 
 > Vollstaendige KI-Konfiguration fuer alle Teams.
-> Ein Script bringt alles in dein Projekt – Claude Code und GitHub Copilot ready.
+> Ein Script bringt alles in dein Projekt – Claude Code, GitHub Copilot und Mistral Vibe ready.
 
 ---
 
@@ -21,6 +21,7 @@ bash ../ai-knowledgebase/dev-setup-template/setup.sh
 Das Script:
 - Kopiert alle Agents, Rules, Skills, Commands in dein `.claude/`
 - Kopiert alle Copilot Agents und `copilot-instructions.md` in `.github/`
+- Kopiert Mistral Vibe Config und Skills in `.vibe/` + `AGENTS.md`
 - Kopiert `.mcp.json` und `.vscode/mcp.json`
 - Legt `tasks/lessons.md` und `tasks/todo.md` an (falls nicht vorhanden)
 - Ueberspringt Dateien die bereits existieren (kein Ueberschreiben!)
@@ -41,10 +42,10 @@ bash ../ai-knowledgebase/dev-setup-template/setup.sh --update
 ```
 
 **Was --update aktualisiert:** `.claude/agents/`, `.claude/rules/`, `.claude/skills/`,
-`.claude/commands/`, `.github/agents/`, `.mcp.json`, `.vscode/mcp.json`
+`.claude/commands/`, `.github/agents/`, `.vibe/agents/`, `.vibe/skills/`, `.mcp.json`, `.vscode/mcp.json`
 
-**Was --update NICHT anfasst:** `CLAUDE.md`, `MEMORY.md`, `.github/copilot-instructions.md`,
-`tasks/lessons.md`, `tasks/todo.md`, `.claude/settings.json`
+**Was --update NICHT anfasst:** `CLAUDE.md`, `AGENTS.md`, `MEMORY.md`, `.github/copilot-instructions.md`,
+`tasks/lessons.md`, `tasks/todo.md`, `.claude/settings.json`, `.vibe/config.toml`
 
 ---
 
@@ -89,10 +90,17 @@ Dann reicht `make ki-update` fuer alle.
   agents/        # @DevAgent @TestAgent @ReviewAgent @DocsAgent @KnowledgeAgent
   copilot-instructions.md  # Copilot-Konfiguration + Security + Ralph-Loop
 
-.mcp.json              # MCP Server: Playwright, GitHub, PostgreSQL, Context7, Figma, Draw.io
+.vibe/
+  config.toml    # Mistral Vibe Projekt-Config (Modell, MCP-Server, Permissions)
+  agents/        # Dev, Test, Review, Docs, Knowledge Agent (TOML)
+  skills/        # dev-standards, frontend-design, ceo-brief, automation-design,
+                 # document-creation, agent-orchestration (SKILL.md Format)
+
+.mcp.json              # MCP Server: Playwright, GitHub, PostgreSQL, Context7, Figma
 .vscode/mcp.json       # Gleiche Server fuer VS Code / GitHub Copilot
 
-CLAUDE.md              # Unternehmens-Kontext (ANPASSEN!)
+CLAUDE.md              # Unternehmens-Kontext fuer Claude Code (ANPASSEN!)
+AGENTS.md              # Unternehmens-Kontext fuer Mistral Vibe (ANPASSEN!)
 MEMORY.md              # KI-Langzeitgedaechtnis fuer dieses Projekt (wird NIE ueberschrieben)
 tasks/lessons.md       # Team-Learnings (wird NIE ueberschrieben)
 tasks/todo.md          # Task-Plan (wird NIE ueberschrieben)
@@ -105,6 +113,7 @@ tasks/todo.md          # Task-Plan (wird NIE ueberschrieben)
 | Datei | Was anpassen |
 |-------|-------------|
 | `CLAUDE.md` | `[COMPANY NAME]`, `[BRANCHE]`, CI/CD, Hosting, Monitoring |
+| `AGENTS.md` | `[COMPANY NAME]`, `[BRANCHE]` (gleiche Werte wie CLAUDE.md) |
 | `MEMORY.md` | `[COMPANY NAME]`, `[PROJECT NAME]`, initiale Architekturentscheidungen |
 | `.github/copilot-instructions.md` | Gleiche Platzhalter wie CLAUDE.md |
 | `.mcp.json` | `POSTGRES_CONNECTION_STRING`, `GITHUB_TOKEN`, `FIGMA_TOKEN` |
@@ -153,6 +162,62 @@ Plugins werden in `.claude/settings.json` gespeichert und bleiben bei `--update`
 
 ---
 
+## Mistral Vibe (optional)
+
+Falls euer Team **Mistral Teams Lizenzen** hat, koennt ihr Mistral Vibe als CLI-Agent nutzen.
+Vibe arbeitet parallel zu Claude Code im selben Repo (`.claude/` und `.vibe/` stoeren sich nicht).
+
+### Installation
+
+```bash
+curl -LsSf https://mistral.ai/vibe/install.sh | bash
+export MISTRAL_API_KEY=your-key-here
+vibe
+```
+
+### Was ist konfiguriert
+
+| Datei | Zweck |
+|-------|-------|
+| `.vibe/config.toml` | Modell (Devstral 2), MCP-Server, Tool-Permissions |
+| `.vibe/agents/*.toml` | 5 Agents: Dev, Test, Review, Docs, Knowledge |
+| `.vibe/skills/*/SKILL.md` | 6 Skills (gleiche wie Claude Code) |
+| `AGENTS.md` | Projekt-Kontext fuer Vibe (Pendant zu CLAUDE.md) |
+
+### Vibe Agents
+
+**Projekt-Agents** (gleiche Rollen wie Claude Code):
+
+| Agent | Aufruf | Wann |
+|-------|--------|------|
+| Dev Agent | `vibe --agent dev` | Feature-Implementierung, Bug Fixes |
+| Test Agent | `vibe --agent test` | Unit Tests, E2E Tests, Coverage |
+| Review Agent | `vibe --agent review` | Code Review vor PR-Merge |
+| Docs Agent | `vibe --agent docs` | API-Docs, ADRs, Onboarding |
+| Knowledge Agent | `vibe --agent knowledge` | KI-Wissensbasis, Best Practices |
+
+**Built-in Agents:**
+
+| Agent | Aufruf | Wann |
+|-------|--------|------|
+| default | `vibe` | Allgemeine Tasks (fragt vor Tool-Ausfuehrung) |
+| plan | `vibe --agent plan` | Nur Planung, keine Code-Aenderungen |
+| accept-edits | `vibe --agent accept-edits` | Auto-Akzeptieren von Edits |
+| auto-approve | `vibe --agent auto-approve` | Alle Tools automatisch genehmigt |
+
+### Feature-Paritaet: Claude Code vs. Mistral Vibe vs. GitHub Copilot
+
+| Feature | Claude Code | Mistral Vibe | GitHub Copilot |
+|---------|------------|--------------|----------------|
+| Haupt-Config | `CLAUDE.md` | `AGENTS.md` + `.vibe/config.toml` | `copilot-instructions.md` |
+| Agents | `.claude/agents/*.md` (5) | `.vibe/agents/*.toml` (5) | `.github/agents/*.md` (5) |
+| Skills | `.claude/skills/*.md` (6) | `.vibe/skills/*/SKILL.md` (6) | – |
+| Rules | `.claude/rules/*.md` (3) | – (integriert in AGENTS.md) | `.github/instructions/*.md` (3) |
+| Commands | `.claude/commands/*.md` (6) | – (Vibe hat kein Command-System) | `.github/prompts/*.md` (4) |
+| MCP | `.mcp.json` | `config.toml [[mcp_servers]]` | `.vscode/mcp.json` |
+
+---
+
 ## MCP Server
 
 | Server | Zweck | Token noetig? |
@@ -160,7 +225,6 @@ Plugins werden in `.claude/settings.json` gespeichert und bleiben bei `--update`
 | `playwright` | Browser-Tests, E2E, Verifikation im Browser | Nein |
 | `github` | PRs, Issues, Repos | `GITHUB_TOKEN` |
 | `context7` | Aktuelle Library-Docs (kein Halluzinieren) | Nein |
-| `drawio` | Architektur-Diagramme auto-generieren | Nein |
 | `figma` | Design-to-Code, Vue-Komponenten | `FIGMA_TOKEN` |
 | `postgres` | DB-Queries, Schema-Analyse | `POSTGRES_CONNECTION_STRING` |
 

@@ -1,7 +1,7 @@
 # 🧠 KI-Wissensbasis – Unternehmens-Übersicht
 
 > **Stand:** März 2026 | **Quelle:** Interne Recherche & Analyse
-> Diese Wissensbasis strukturiert alle gesammelten KI-Themen in 15 Kategorien + Code Modernisierung.
+> Diese Wissensbasis strukturiert alle gesammelten KI-Themen in 17 Kategorien + Code Modernisierung.
 
 ---
 
@@ -24,6 +24,7 @@
 | 13 | [13-RAG-und-Wissen.md](13-RAG-und-Wissen.md) | **RAG & Wissensmanagement** | CLaRa, Google Notebook LM, WEBMCP |
 | 14 | [14-KI-Strategie-und-Mindset.md](14-KI-Strategie-und-Mindset.md) | **KI Strategie & Mindset** | Sam Altman, Zukunft Software Engineering, Core Principles |
 | 15 | [15-Agent-Einsatz-im-Entwicklungsalltag.md](15-Agent-Einsatz-im-Entwicklungsalltag.md) | **Agent-Einsatz Praxis** | Agents aufrufen, Workflow mit Agents, MCP+Skills+Commands Zusammenspiel, Szenarien |
+| 17 | [17-Mistral-Teams-und-Ecosystem.md](17-Mistral-Teams-und-Ecosystem.md) | **Mistral Teams & Ecosystem** | Mistral Vibe CLI, Devstral 2, Codestral, Le Chat, Continue.dev, MCP-Support |
 | CM | [Code_Modernization/code-modernization-playbook.md](Code_Modernization/code-modernization-playbook.md) | **Code Modernisierung** | COBOL-Migration, Strangler Fig, ROI, Phased Cutover, Swarm fuer Migration |
 
 ---
@@ -56,6 +57,13 @@ In den einzelnen Dateien wird folgendes Schema verwendet:
 
 ### Google
 - Google Agent Development Kit: https://cloud.google.com/products/agent-builder
+
+### Mistral AI
+- Mistral AI: https://mistral.ai
+- Mistral Vibe CLI GitHub: https://github.com/mistralai/mistral-vibe
+- Mistral API Docs: https://docs.mistral.ai
+- Mistral API Console: https://console.mistral.ai
+- Le Chat: https://chat.mistral.ai
 
 ### Tools & Frameworks
 - Shannon AI Pentest: https://shannon-ai.com/pentest-ai

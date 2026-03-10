@@ -60,8 +60,15 @@ Stelle sicher, dass diese erweiterte Tabelle vorhanden ist:
   3. **Grenzwerte die COBOL anders handelt:** Negative Zahlen (unsigned PIC), Überlauf (COBOL schneidet ab, Java Exception), Leerzeichen vs. null
 - Kernaussage: "Byte-für-Byte identisch bei Geldbeträgen"
 
+### Folie nach KI-Tool pro Migrationsschritt: Mistral als Alternative (ERGÄNZEN)
+Falls eine Folie "KI-Tool pro Migrationsschritt" existiert, ergänze:
+- Zeile: "Datenschutzkritisch → Devstral Small 2 lokal via OLLAMA"
+- Hinweis-Box: "Devstral 2 (Mistral) unterstützt COBOL explizit, 72.2% SWE-bench Verified, aktuell GRATIS via API"
+- Kurzer Absatz: "Mistral Vibe CLI kann als Alternative zu Claude Code für Migration-Tasks eingesetzt werden"
+
 ### Folie "Ausblick — Wie geht es weiter?" (ANPASSEN)
 Füge hinzu:
+- **Mistral Vibe CLI:** Open-Source CLI-Agent von Mistral (github.com/mistralai/mistral-vibe), Devstral 2 aktuell GRATIS
 - **Vibe Kanban:** Kanban-Board für KI-Agents — Tasks zuweisen, parallel ausführen, Diffs reviewen (`npx vibe-kanban`)
 
 ### Folie "Gesamtzusammenfassung 3 Tage" (ANPASSEN)

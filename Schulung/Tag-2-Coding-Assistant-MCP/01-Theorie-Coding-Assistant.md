@@ -373,6 +373,26 @@ Lohnt sich NICHT:
 
 **Faustregel:** Claude Code hat deutlich mehr Automatisierung out-of-the-box. Copilot ist stärker bei IDE-Integration und Inline-Completion.
 
+### Alternative: Mistral Vibe CLI + Continue.dev
+
+Falls euer Team **Mistral Teams Lizenzen** hat, gibt es einen dritten Weg:
+
+| Tool | Typ | Stärke | Config |
+|------|-----|--------|--------|
+| Claude Code | CLI-Agent | Reifstes Ecosystem, CLAUDE.md, Rules, Skills | `.claude/`, `CLAUDE.md` |
+| Mistral Vibe | CLI-Agent | Open Source, Devstral 2 (72.2% SWE-bench), GRATIS | `.vibe/config.toml`, `AGENTS.md` |
+| GitHub Copilot | IDE-Plugin | Inline-Completion, Chat in VS Code | `.github/copilot-instructions.md` |
+| Continue.dev + Codestral | IDE-Plugin | FIM-Autocomplete, sehr günstig (€0.30/M Tokens) | Continue.dev Extension |
+
+**Mistral Vibe installieren:**
+```bash
+curl -LsSf https://mistral.ai/vibe/install.sh | bash
+export MISTRAL_API_KEY=your-key
+vibe
+```
+
+Vibe nutzt `.vibe/config.toml` statt `CLAUDE.md` und `AGENTS.md` im Workspace-Root für Projektkontext. Das dev-setup-template liefert beides mit — Claude Code und Vibe können parallel im selben Repo arbeiten.
+
 ### /ralph – Iterativer Selbst-Verifikations-Loop
 
 Der `/ralph` Command ist unser Qualitäts-Firewall vor dem Commit:

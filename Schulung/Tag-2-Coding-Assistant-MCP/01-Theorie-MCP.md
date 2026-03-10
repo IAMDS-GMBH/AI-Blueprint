@@ -64,9 +64,30 @@ Mit MCP:   Ein Protokoll → jeder MCP-Server funktioniert in jedem MCP-Client
 
 ### MCP-Clients (die KI nutzt den Server)
 - Claude Code, Claude Desktop
+- **Mistral Vibe CLI** (stdio + http, konfiguriert in `.vibe/config.toml`)
+- **Le Chat** (Mistral) — nur Remote MCP-Server via SSE, kein stdio
 - GitHub Copilot (VS Code)
 - Cursor, Windsurf, Cline
 - Jede App die das MCP-Protokoll implementiert
+
+> **Gut zu wissen:** MCP-Server die ihr in dieser Aufgabe baut funktionieren mit Claude Code UND Mistral Vibe. Einmal bauen, überall nutzen.
+
+**MCP-Config: Claude Code vs. Mistral Vibe:**
+
+Claude Code (`.mcp.json` — JSON):
+```json
+{ "mcpServers": { "postgres": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-postgres"] } } }
+```
+
+Mistral Vibe (`.vibe/config.toml` — TOML):
+```toml
+[[mcp_servers]]
+name = "postgres"
+transport = "stdio"
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-postgres"]
+env = { POSTGRES_CONNECTION_STRING = "${POSTGRES_CONNECTION_STRING}" }
+```
 
 ---
 

@@ -141,13 +141,15 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 3 einer KI-Schulu
 ### Folie 17: KI-Tool pro Migrationsschritt
 - Tabelle:
   | Schritt | Tool |
-  | Analyse | Claude Code Chat |
-  | Kritische Stellen | Claude Code Chat |
+  | Analyse | Claude Code Chat / Mistral Vibe |
+  | Kritische Stellen | Claude Code Chat / Mistral Vibe |
   | Planung | /plan oder Chat |
-  | Implementierung | Claude Code Dev Agent |
+  | Implementierung | Claude Code Dev Agent / Vibe CLI |
   | Tests | Claude Code Test Agent |
   | Verifikation | Chain-of-Verification |
   | Große Migration | /swarm |
+  | Datenschutzkritisch | Devstral Small 2 lokal via OLLAMA |
+- Hinweis-Box: "Devstral 2 (Mistral) unterstützt COBOL explizit, 72.2% SWE-bench, aktuell GRATIS"
 
 ### Folie 17b: Verifikationsstrategie — Ist die Migration korrekt?
 - 3 Schritte:

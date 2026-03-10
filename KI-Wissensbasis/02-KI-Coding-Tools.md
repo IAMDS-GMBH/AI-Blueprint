@@ -29,6 +29,30 @@
 
 ---
 
+## Mistral Vibe Ecosystem
+
+### Mistral Vibe CLI `⭐ HOCH`
+- **Was:** CLI-basierter Coding-Agent von Mistral, Open Source (MIT/Apache 2.0)
+- **Features:** Code-Generierung, Multi-File Orchestration, MCP-Support, Subagents, Skills
+- **Modell:** Devstral 2 (123B, 72.2% SWE-bench)
+- **Config:** `.vibe/config.toml` (Projekt-Level), Agents als TOML, Skills als SKILL.md
+- **Install:** `curl -LsSf https://mistral.ai/vibe/install.sh | bash`
+- **Aktion:** [ ] Vibe installieren und Parallelbetrieb mit Claude Code testen
+
+### Codestral + Continue.dev (IDE Autocomplete) `🔵 MITTEL`
+- **Was:** Codestral als Autocomplete-Provider in VS Code / JetBrains via Continue.dev
+- **Warum relevant:** FIM-Support (Fill-in-the-Middle), sehr schnell, guenstig (0.30/0.90 EUR/M Tokens)
+- **Aktion:** [ ] Continue.dev Extension installieren + Codestral konfigurieren
+
+### Le Chat Canvas `🔵 MITTEL`
+- **Was:** Mistrals Chat-Interface mit kollaborativem Code-Editing
+- **Features:** Web-Suche, Custom Agents, Python Sandbox, MCP-Support (Remote SSE)
+- **Aktion:** [ ] Le Chat fuer Team-Collaboration evaluieren
+
+→ Details: siehe [17-Mistral-Teams-und-Ecosystem.md](17-Mistral-Teams-und-Ecosystem.md)
+
+---
+
 ## Open-Source Coding Agents
 
 ### OpenClaw `⭐ HOCH`

@@ -2,8 +2,8 @@
 
 # =============================================================================
 # KI-Setup Installer
-# Kopiert die KI-Konfiguration (Claude Code + Copilot) in ein bestehendes Projekt.
-# Aufruf: bash setup.sh [--update]
+# Kopiert die KI-Konfiguration (Claude Code + Copilot + Mistral Vibe) in ein
+# bestehendes Projekt. Aufruf: bash setup.sh [--update]
 # =============================================================================
 
 set -e
@@ -60,7 +60,7 @@ copy_dir_merge() {
 # -----------------------------------------------------------------------------
 # 1. Claude Code Konfiguration
 # -----------------------------------------------------------------------------
-echo -e "${BLUE}[1/5] Claude Code (.claude/)${NC}"
+echo -e "${BLUE}[1/7] Claude Code (.claude/)${NC}"
 
 copy_dir_merge "$SCRIPT_DIR/.claude/agents"   "$TARGET_DIR/.claude/agents"
 copy_dir_merge "$SCRIPT_DIR/.claude/commands" "$TARGET_DIR/.claude/commands"
@@ -72,7 +72,7 @@ copy_if_not_exists "$SCRIPT_DIR/.claude/settings.json" "$TARGET_DIR/.claude/sett
 # 2. GitHub Copilot Konfiguration
 # -----------------------------------------------------------------------------
 echo ""
-echo -e "${BLUE}[2/5] GitHub Copilot (.github/)${NC}"
+echo -e "${BLUE}[2/7] GitHub Copilot (.github/)${NC}"
 
 copy_dir_merge "$SCRIPT_DIR/.github/agents"       "$TARGET_DIR/.github/agents"
 copy_dir_merge "$SCRIPT_DIR/.github/instructions" "$TARGET_DIR/.github/instructions"
@@ -82,7 +82,7 @@ copy_if_not_exists "$SCRIPT_DIR/.github/copilot-instructions.md" "$TARGET_DIR/.g
 # 3. MCP Server
 # -----------------------------------------------------------------------------
 echo ""
-echo -e "${BLUE}[3/5] MCP Server (.mcp.json + .vscode/mcp.json)${NC}"
+echo -e "${BLUE}[3/7] MCP Server (.mcp.json + .vscode/mcp.json)${NC}"
 
 copy_if_not_exists "$SCRIPT_DIR/.mcp.json"         "$TARGET_DIR/.mcp.json"
 copy_if_not_exists "$SCRIPT_DIR/.vscode/mcp.json"  "$TARGET_DIR/.vscode/mcp.json"
@@ -91,7 +91,7 @@ copy_if_not_exists "$SCRIPT_DIR/.vscode/mcp.json"  "$TARGET_DIR/.vscode/mcp.json
 # 4. CLAUDE.md + MEMORY.md (Haupt-Konfiguration)
 # -----------------------------------------------------------------------------
 echo ""
-echo -e "${BLUE}[4/5] CLAUDE.md + MEMORY.md${NC}"
+echo -e "${BLUE}[4/7] CLAUDE.md + MEMORY.md${NC}"
 
 copy_if_not_exists "$SCRIPT_DIR/CLAUDE.md"   "$TARGET_DIR/CLAUDE.md"
 copy_if_not_exists "$SCRIPT_DIR/MEMORY.md"   "$TARGET_DIR/MEMORY.md"
@@ -100,7 +100,37 @@ copy_if_not_exists "$SCRIPT_DIR/MEMORY.md"   "$TARGET_DIR/MEMORY.md"
 # 5. Tasks-Ordner (nur anlegen, nicht ueberschreiben)
 # -----------------------------------------------------------------------------
 echo ""
-echo -e "${BLUE}[5/5] Tasks-Ordner${NC}"
+echo -e "${BLUE}[5/7] Mistral Vibe (.vibe/)${NC}"
+
+copy_if_not_exists "$SCRIPT_DIR/.vibe/config.toml" "$TARGET_DIR/.vibe/config.toml"
+
+# Agents-Verzeichnis (TOML-Dateien)
+copy_dir_merge "$SCRIPT_DIR/.vibe/agents" "$TARGET_DIR/.vibe/agents"
+
+# Skills-Verzeichnis (Unterordner mit SKILL.md)
+if [[ -d "$SCRIPT_DIR/.vibe/skills" ]]; then
+  for skill_dir in "$SCRIPT_DIR/.vibe/skills"/*/; do
+    skill_name="$(basename "$skill_dir")"
+    mkdir -p "$TARGET_DIR/.vibe/skills/$skill_name"
+    for file in "$skill_dir"*; do
+      [[ -f "$file" ]] && copy_if_not_exists "$file" "$TARGET_DIR/.vibe/skills/$skill_name/$(basename "$file")"
+    done
+  done
+fi
+
+# -----------------------------------------------------------------------------
+# 6. AGENTS.md (Mistral Vibe Workspace-Instruktionen)
+# -----------------------------------------------------------------------------
+echo ""
+echo -e "${BLUE}[6/7] AGENTS.md (Mistral Vibe)${NC}"
+
+copy_if_not_exists "$SCRIPT_DIR/AGENTS.md" "$TARGET_DIR/AGENTS.md"
+
+# -----------------------------------------------------------------------------
+# 7. Tasks-Ordner (nur anlegen, nicht ueberschreiben)
+# -----------------------------------------------------------------------------
+echo ""
+echo -e "${BLUE}[7/7] Tasks-Ordner${NC}"
 
 mkdir -p "$TARGET_DIR/tasks"
 
@@ -164,9 +194,16 @@ echo "     /plugin install ralph-loop@claude-plugins-official"
 echo "     /plugin install context7@claude-plugins-official"
 echo "     /plugin install security-guidance@claude-plugins-official"
 echo ""
-echo "  5. Optional: GSD (Get Shit Done) fuer grosse Projekte:"
+echo "  5. Mistral Vibe (optional, falls Mistral Teams vorhanden):"
+echo "     curl -LsSf https://mistral.ai/vibe/install.sh | bash"
+echo "     export MISTRAL_API_KEY=your-key-here"
+echo "     → AGENTS.md Platzhalter anpassen"
+echo "     → .vibe/config.toml MCP-Server Tokens eintragen"
+echo "     → Starten: vibe"
+echo ""
+echo "  6. Optional: GSD (Get Shit Done) fuer grosse Projekte:"
 echo "     npx get-shit-done-cc@latest"
 echo "     → Danach in Claude Code: /gsd:help"
 echo ""
-echo "  Alles fertig? → Claude Code starten: claude"
+echo "  Alles fertig? → Claude Code: claude | Mistral Vibe: vibe"
 echo ""

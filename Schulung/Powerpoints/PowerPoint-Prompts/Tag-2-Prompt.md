@@ -135,8 +135,8 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
 - Pfeil zu:
   - MIT USB: Ein Standard → jedes Gerät funktioniert überall
   - MIT MCP: Ein Protokoll → jeder MCP-Server funktioniert in jedem Client
-- MCP-Clients: Claude Code, Copilot, Cursor, Windsurf, Claude Desktop
-- Kernaussage: "MCP = offener Standard von Anthropic, basiert auf JSON-RPC 2.0"
+- MCP-Clients: Claude Code, **Mistral Vibe**, Copilot, Cursor, Windsurf, Claude Desktop, **Le Chat** (nur Remote SSE)
+- Kernaussage: "MCP = offener Standard von Anthropic, basiert auf JSON-RPC 2.0 — einmal bauen, überall nutzen"
 
 ### Folie 17: MCP auf Protokoll-Ebene (JSON-RPC 2.0)
 - Zwei JSON-Blöcke nebeneinander:
@@ -200,11 +200,12 @@ Erstelle eine professionelle PowerPoint-Präsentation für Tag 2 einer KI-Schulu
   - Resources (Daten): Was KI lesen kann (z.B. db://schema)
   - Prompts (Vorlagen): Vorgefertigte Templates
 
-### Folie 25: MCP-Konfiguration
-- Zwei Code-Blöcke nebeneinander:
-  - Claude Code (.mcp.json): mcpServers → command, args, env
+### Folie 25: MCP-Konfiguration — 3 Tools, 1 Server
+- Drei Code-Blöcke nebeneinander:
+  - Claude Code (.mcp.json): `{ "mcpServers": { "postgres": { "command": "npx", ... } } }`
+  - Mistral Vibe (.vibe/config.toml): `[[mcp_servers]]` name, transport, command, args, env
   - Copilot (.vscode/mcp.json): servers → type, command, args
-- "Danach kann KI sagen: 'Ich nutze jetzt get-user aus dem MCP-Server...'"
+- Kernaussage: "Gleicher MCP-Server, 3 verschiedene Configs — einmal bauen, überall nutzen"
 
 ### Folie 26: MCP + Datenbank
 - Workflow-Diagramm (4 Schritte):

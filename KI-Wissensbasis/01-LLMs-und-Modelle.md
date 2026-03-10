@@ -38,6 +38,31 @@
 
 ---
 
+## Mistral Coding-Modelle
+
+### Devstral 2 (123B) `⭐ HOCH`
+- **Was:** Flagship Coding-Modell von Mistral AI fuer Software Engineering Agents
+- **Context:** 256K Tokens, 72.2% SWE-bench Verified
+- **Warum relevant:** Bis zu 7x kosteneffizienter als Claude Sonnet, aktuell GRATIS via API
+- **Lizenz:** Modified MIT (Open Source)
+- **Aktion:** [ ] Vergleichstest Devstral 2 vs. Claude Sonnet fuer Code-Generierung
+
+### Devstral Small 2 (24B) `🔵 MITTEL`
+- **Was:** Kompakte Version fuer Laptops und Edge-Deployment
+- **Context:** 256K Tokens, 68.0% SWE-bench Verified
+- **Lizenz:** Apache 2.0 – lokal via OLLAMA betreibbar
+- **Aktion:** [ ] Lokalen Betrieb via OLLAMA testen
+
+### Codestral (25.01) `🔵 MITTEL`
+- **Was:** Code-Generierung und IDE-Autocomplete mit FIM (Fill-in-the-Middle)
+- **Sprachen:** 80+ inkl. COBOL
+- **Pricing:** 0.30/0.90 EUR pro Million Tokens (sehr guenstig)
+- **Aktion:** [ ] Continue.dev mit Codestral fuer Autocomplete konfigurieren
+
+→ Details: siehe [17-Mistral-Teams-und-Ecosystem.md](17-Mistral-Teams-und-Ecosystem.md)
+
+---
+
 ## Hinweise
 - Bei der Modell-Evaluation immer beachten: **Lizenz, Datenschutz, Performance, Kosten**
 - Lokale Modelle benötigen passende Hardware → siehe [11-Lokale-KI.md](11-Lokale-KI.md)

@@ -43,8 +43,8 @@ Die bestehenden MCP-Folien (Warum MCP besser als REST, Tool-Call, Tool-Descripti
 - Pfeil zu:
   - MIT USB: Ein Standard → jedes Gerät funktioniert überall
   - MIT MCP: Ein Protokoll → jeder Server funktioniert in jedem Client
-- MCP-Clients auflisten: Claude Code, Copilot, Cursor, Windsurf, Claude Desktop
-- Kernaussage: "MCP = offener Standard von Anthropic, basiert auf JSON-RPC 2.0"
+- MCP-Clients auflisten: Claude Code, **Mistral Vibe**, Copilot, Cursor, Windsurf, Claude Desktop, **Le Chat** (nur Remote SSE)
+- Kernaussage: "MCP = offener Standard von Anthropic, basiert auf JSON-RPC 2.0 — einmal bauen, überall nutzen"
 
 ### NEUE Folie: "MCP auf Protokoll-Ebene (JSON-RPC 2.0)"
 - Zwei JSON-Blöcke nebeneinander:
@@ -88,7 +88,7 @@ Diese Folien sollten bereits existieren — falls ja, nicht ändern (nur Design-
 - Wie ein MCP-Tool-Call abläuft (5-Schritte Sequenz-Diagramm)
 - Tool-Descriptions Schlecht vs. Gut
 - Anatomie eines MCP-Servers (Tools, Resources, Prompts)
-- MCP-Konfiguration (.mcp.json vs. .vscode/mcp.json)
+- MCP-Konfiguration (.mcp.json vs. .vscode/mcp.json vs. .vibe/config.toml)
 - MCP + Datenbank Workflow
 - Authentifizierung 3 Ebenen
 - SQL-Injection im MCP-Kontext
@@ -101,8 +101,9 @@ Diese Folien sollten bereits existieren — falls ja, nicht ändern (nur Design-
 ## 5. Zusammenfassung anpassen
 
 Letzte Folie "Zusammenfassung Tag 2" — Key Takeaways:
-1. Kontext-Hierarchie: CLAUDE.md → Rules → Skills → Prompt
+1. Kontext-Hierarchie: CLAUDE.md → Rules → Skills → Prompt (Vibe: .vibe/config.toml + AGENTS.md)
 2. lessons.md = Team-Gedächtnis gegen wiederkehrende Fehler
 3. /plan, /ralph, /swarm als Qualitäts-Workflow
-4. MCP = USB-Standard für KI-Tool-Interaktion (JSON-RPC 2.0, stdio/HTTP)
+4. MCP = USB-Standard für KI-Tool-Interaktion — einmal bauen, mit Claude Code UND Mistral Vibe nutzen
 5. Security first: 3-Ebenen-Auth + Unternehmens-Checklist
+6. Mistral Vibe CLI als Open-Source-Alternative (Devstral 2, GRATIS, .vibe/config.toml)

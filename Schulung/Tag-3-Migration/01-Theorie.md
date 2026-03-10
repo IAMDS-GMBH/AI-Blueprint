@@ -242,6 +242,10 @@ public void handleOrderCreated(OrderCreatedEvent event) {
 | **Finanziell** | +14% höherer Marktwert bei Unternehmen die modernisieren (Deloitte-Studie) |
 | **Entwickler-Retention** | Moderne Stacks = bessere Kandidaten, weniger Burnout |
 
+### Alternative: Mistral Devstral fuer Migrationen
+
+Mistrals **Devstral 2** (123B Parameter) unterstützt COBOL explizit als Quellsprache und erreicht 72.2% auf SWE-bench Verified. Die **Mistral Vibe CLI** kann ähnlich wie Claude Code als Terminal-basierter Coding-Agent für Migration-Tasks eingesetzt werden (`curl -LsSf https://mistral.ai/vibe/install.sh | bash`). Besonders interessant für datenschutzkritische Migrationen: **Devstral Small 2** (24B) ist Apache 2.0 und läuft lokal via OLLAMA — der Legacy-Code bleibt vollständig on-premise. In der Praxis lassen sich Claude Code und Vibe CLI komplementär nutzen, z.B. Claude Code für die Hauptmigration und Devstral lokal für vertrauliche Quellen.
+
 ---
 
 ## 5. Der Phasenplan: Von Pilot zu Enterprise-Modernisierung

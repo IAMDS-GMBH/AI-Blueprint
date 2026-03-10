@@ -1,0 +1,66 @@
+# Mistral Vibe – Projekt-Konfiguration
+# Generiert via dev-setup-template
+# Pendant zu .claude/settings.json + CLAUDE.md fuer Claude Code
+
+# --- Modell ---
+active_model = "devstral-2"
+
+# --- Pfade ---
+skill_paths = [".vibe/skills"]
+agent_paths = [".vibe/agents"]
+
+# --- Tool Permissions ---
+# "always" = automatisch erlaubt, "ask" = vor Ausfuehrung fragen
+[tool_permissions]
+read_file = "always"
+grep = "always"
+list_dir = "always"
+write_file = "ask"
+patch_file = "ask"
+bash = "ask"
+create_file = "ask"
+delete_file = "ask"
+
+# --- Workspace ---
+# AGENTS.md wird automatisch gelesen (Pendant zu CLAUDE.md)
+# Gleiche Projektstruktur wie bei Claude Code:
+#   tasks/lessons.md  – Team-Learnings (zu Session-Start lesen)
+#   tasks/todo.md     – Aktueller Plan
+#   MEMORY.md         – Persistentes Projekt-Gedaechtnis
+
+# --- MCP Server ---
+# Gleiche Server wie in .mcp.json (fuer Claude Code) und .vscode/mcp.json (fuer Copilot).
+# Alle 3 Configs nutzen dieselben MCP-Server, nur in unterschiedlichen Formaten.
+
+[[mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = ["-y", "@playwright/mcp@latest"]
+
+[[mcp_servers]]
+name = "github"
+transport = "stdio"
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-github"]
+env = { GITHUB_TOKEN = "${GITHUB_TOKEN}" }
+
+[[mcp_servers]]
+name = "figma"
+transport = "stdio"
+command = "npx"
+args = ["-y", "figma-mcp-server"]
+env = { FIGMA_TOKEN = "${FIGMA_TOKEN}" }
+
+[[mcp_servers]]
+name = "postgres"
+transport = "stdio"
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-postgres"]
+env = { POSTGRES_CONNECTION_STRING = "${POSTGRES_CONNECTION_STRING}" }
+
+[[mcp_servers]]
+name = "context7"
+transport = "stdio"
+command = "npx"
+args = ["-y", "@upstash/context7-mcp@latest"]
