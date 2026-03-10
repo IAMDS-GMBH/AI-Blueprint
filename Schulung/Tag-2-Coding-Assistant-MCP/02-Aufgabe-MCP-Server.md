@@ -31,6 +31,8 @@ MCP Server (TypeScript) ← wird heute gebaut
 PostgreSQL Datenbank
 ```
 
+**Datenbank:** Die PostgreSQL-Instanz wird ueber Docker Compose gestartet – siehe `Database-Starter/` im selben Verzeichnis.
+
 ---
 
 ## 1. MCP-Server Projekt aufsetzen
