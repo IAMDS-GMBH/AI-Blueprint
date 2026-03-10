@@ -5,7 +5,7 @@
 
 ---
 
-## Quickstart (1 Befehl)
+## Quickstart
 
 ```bash
 # Repo klonen (einmalig, z.B. neben euren Projekten)
@@ -16,14 +16,30 @@ cd mein-projekt
 bash ../ai-knowledgebase/dev-setup-template/setup.sh
 ```
 
-**Das war's.** Danach nur noch Platzhalter in `CLAUDE.md` ersetzen und `claude` starten.
+Das Script fragt interaktiv welche Tools eingerichtet werden sollen:
+```
+Welche Tools moechtest du einrichten?
+
+  1) Claude Code        (.claude/, CLAUDE.md, .mcp.json)
+  2) GitHub Copilot     (.github/, .vscode/mcp.json)
+  3) Mistral Vibe       (.vibe/, AGENTS.md)
+  4) Alle drei
+
+Auswahl (z.B. 1,3 oder 4):
+```
+
+Alternativ direkt per Argument:
+```bash
+bash setup.sh claude              # Nur Claude Code
+bash setup.sh copilot mistral     # Copilot + Mistral
+bash setup.sh --all               # Alle drei
+```
+
+Danach Platzhalter in der jeweiligen Config-Datei ersetzen und loslegen.
 
 Das Script:
-- Kopiert alle Agents, Rules, Skills, Commands in dein `.claude/`
-- Kopiert alle Copilot Agents und `copilot-instructions.md` in `.github/`
-- Kopiert Mistral Vibe Config und Skills in `.vibe/` + `AGENTS.md`
-- Kopiert `.mcp.json` und `.vscode/mcp.json`
-- Legt `tasks/lessons.md` und `tasks/todo.md` an (falls nicht vorhanden)
+- Kopiert nur die Dateien fuer das gewaehlte Tool
+- Legt `MEMORY.md`, `tasks/lessons.md` und `tasks/todo.md` immer an (gemeinsam genutzt)
 - Ueberspringt Dateien die bereits existieren (kein Ueberschreiben!)
 
 ---
@@ -34,15 +50,13 @@ Das Script:
 # Repo aktualisieren
 cd ai-knowledgebase && git pull
 
-# Update ins Projekt einspielen
-# Agents, Rules, Skills werden aktualisiert
-# CLAUDE.md, copilot-instructions.md und lessons.md bleiben erhalten
+# Update ins Projekt einspielen (nur fuer die genutzten Tools)
 cd mein-projekt
-bash ../ai-knowledgebase/dev-setup-template/setup.sh --update
+bash ../ai-knowledgebase/dev-setup-template/setup.sh --update claude
+bash ../ai-knowledgebase/dev-setup-template/setup.sh --update --all
 ```
 
-**Was --update aktualisiert:** `.claude/agents/`, `.claude/rules/`, `.claude/skills/`,
-`.claude/commands/`, `.github/agents/`, `.vibe/agents/`, `.vibe/skills/`, `.mcp.json`, `.vscode/mcp.json`
+**Was --update aktualisiert:** Agents, Rules, Skills, Commands, MCP-Configs des gewaehlten Tools
 
 **Was --update NICHT anfasst:** `CLAUDE.md`, `AGENTS.md`, `MEMORY.md`, `.github/copilot-instructions.md`,
 `tasks/lessons.md`, `tasks/todo.md`, `.claude/settings.json`, `.vibe/config.toml`
