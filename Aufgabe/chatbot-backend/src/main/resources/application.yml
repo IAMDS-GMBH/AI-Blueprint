@@ -1,0 +1,7 @@
+server:
+  port: 8080
+
+mistral:
+  api-key: ${MISTRAL_API_KEY:}
+  model: mistral-small-latest
+  api-url: https://api.mistral.ai/v1/chat/completions
