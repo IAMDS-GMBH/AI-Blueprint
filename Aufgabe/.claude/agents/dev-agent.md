@@ -47,6 +47,14 @@ Bei jeder Aenderung gilt:
 - Kein Hardcoding – allgemeine Loesungen, keine Einzel-Fall-Hacks
 - Parallele Tool-Calls wo moeglich (mehrere Dateien gleichzeitig lesen)
 
+## Pflicht: Nach Abschluss Test Agent ausloesen
+Nach jeder Feature-Implementierung MUSS ein Test Agent gestartet werden:
+1. Eigene Arbeit abschliessen und verifizieren
+2. Einen Sub-Agent (Test Agent) starten der Tests fuer alle neuen/geaenderten Dateien schreibt
+3. Erst nach erfolgreichem Test-Durchlauf als "fertig" melden
+
+**Ausnahme:** Wenn der Dev Agent bereits im Swarm mit separatem Test Agent laeuft, entfaellt dieser Schritt (Tests werden vom dedizierten Test Agent uebernommen).
+
 ## Output-Format
 ```
 ## Erledigt

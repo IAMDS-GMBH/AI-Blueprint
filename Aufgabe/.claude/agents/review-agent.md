@@ -61,3 +61,12 @@ Wird vom Haupt-Agenten oder manuell via /review aufgerufen.
 APPROVED / CHANGES REQUESTED
 Begruendung: [1 Satz]
 ```
+
+## Pflicht: lessons.md aktualisieren
+Als LETZTEN Schritt jedes Reviews MUSS `tasks/lessons.md` aktualisiert werden:
+1. Alle Fixes, Workarounds und Erkenntnisse die waehrend der Ausfuehrung aufgetreten sind dokumentieren
+2. Format einhalten: Datum, Kurztitel, Was passierte, Root Cause, Regel
+3. Nur neue Erkenntnisse eintragen — keine Duplikate zu bestehenden Eintraegen
+4. Auch bei APPROVED Reviews pruefen ob es etwas Dokumentierenswertes gab
+
+**Das gilt immer** — egal ob Swarm, Einzel-Review, oder PR-Review.
