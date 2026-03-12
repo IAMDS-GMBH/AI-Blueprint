@@ -171,7 +171,7 @@ public class ChatServiceImpl implements ChatService {
         body.put("model", model);
         body.put("messages", messages);
         if (includeTools) {
-            body.put("tools", ToolDefinition.getToolDefinitions());
+            body.put("tools", mcpClient.getToolDefinitions());
             body.put("tool_choice", "auto");
         }
         return body;

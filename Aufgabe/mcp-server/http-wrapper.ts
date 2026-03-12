@@ -76,20 +76,30 @@ const TOOL_DEFINITIONS = [
   },
   {
     name: "query-users",
-    description: "Gibt eine Liste von Usern zurueck. Maximal 50 Eintraege. Passwoerter werden NICHT zurueckgegeben.",
+    description: "Gibt eine Liste von Kunden zurueck. Maximal 50 Eintraege.",
     parameters: {
-      limit: { type: "number", description: "Anzahl der zurueckgegebenen User (max 50)", required: false },
+      limit: { type: "number", description: "Anzahl der zurueckgegebenen Kunden (max 50)", required: false },
       offset: { type: "number", description: "Startposition fuer Paginierung", required: false },
     },
   },
   {
     name: "get-user-by-email",
-    description: "Sucht einen User anhand der E-Mail-Adresse.",
+    description: "Sucht einen Kunden anhand der E-Mail-Adresse.",
     parameters: {
-      email: { type: "string", description: "E-Mail-Adresse des gesuchten Users", required: true },
+      email: { type: "string", description: "E-Mail-Adresse des gesuchten Kunden", required: true },
     },
   },
 ];
+
+// Tabellennamen case-insensitiv aufloesen (LLMs senden oft "Kunden" statt "kunden")
+async function resolveTableName(input: string): Promise<string> {
+  const tables = await listTables();
+  const match = tables.find((t) => t.toLowerCase() === input.toLowerCase());
+  if (!match) {
+    throw new Error(`Tabelle '${input}' nicht gefunden oder nicht erlaubt`);
+  }
+  return match;
+}
 
 // Tool-Handler: Jeder fuehrt die entsprechende DB-Operation aus
 const toolHandlers: Record<string, (args: Record<string, unknown>) => Promise<unknown>> = {
@@ -98,8 +108,9 @@ const toolHandlers: Record<string, (args: Record<string, unknown>) => Promise<un
   },
 
   "describe-table": async (args) => {
-    const tableName = args.tableName as string;
-    if (!tableName) throw new Error("tableName ist erforderlich");
+    const input = args.tableName as string;
+    if (!input) throw new Error("tableName ist erforderlich");
+    const tableName = await resolveTableName(input);
     return await getTableSchema(tableName);
   },
 
@@ -113,14 +124,11 @@ const toolHandlers: Record<string, (args: Record<string, unknown>) => Promise<un
   },
 
   "count-rows": async (args) => {
-    const tableName = args.tableName as string;
+    const input = args.tableName as string;
     const whereClause = args.whereClause as string | undefined;
-    if (!tableName) throw new Error("tableName ist erforderlich");
+    if (!input) throw new Error("tableName ist erforderlich");
 
-    const allowedTables = await listTables();
-    if (!allowedTables.includes(tableName)) {
-      throw new Error(`Tabelle '${tableName}' nicht gefunden oder nicht erlaubt`);
-    }
+    const tableName = await resolveTableName(input);
 
     if (whereClause) {
       validateWhereClause(whereClause);
@@ -136,17 +144,14 @@ const toolHandlers: Record<string, (args: Record<string, unknown>) => Promise<un
   },
 
   "query-table": async (args) => {
-    const tableName = args.tableName as string;
+    const input = args.tableName as string;
     const columns = args.columns as string[] | undefined;
     const whereClause = args.whereClause as string | undefined;
     const limit = Math.min(Math.max((args.limit as number) || 50, 1), 50);
 
-    if (!tableName) throw new Error("tableName ist erforderlich");
+    if (!input) throw new Error("tableName ist erforderlich");
 
-    const allowedTables = await listTables();
-    if (!allowedTables.includes(tableName)) {
-      throw new Error(`Tabelle '${tableName}' nicht gefunden oder nicht erlaubt`);
-    }
+    const tableName = await resolveTableName(input);
 
     if (whereClause) {
       validateWhereClause(whereClause);
@@ -166,7 +171,11 @@ const toolHandlers: Record<string, (args: Record<string, unknown>) => Promise<un
     } else {
       for (const col of safeColumns) {
         if (!validColumnNames.includes(col)) {
-          throw new Error(`Spalte '${col}' existiert nicht in Tabelle '${tableName}'`);
+          throw new Error(
+            `Spalte '${col}' existiert nicht in Tabelle '${tableName}'. ` +
+            `Verfuegbare Spalten: ${validColumnNames.join(", ")}. ` +
+            `Hinweis: Nur echte Spaltennamen erlaubt, keine SQL-Funktionen (AVG, COUNT, etc.).`
+          );
         }
       }
       selectPart = safeColumns.map((c) => `"${c}"`).join(", ");
@@ -186,7 +195,7 @@ const toolHandlers: Record<string, (args: Record<string, unknown>) => Promise<un
     const offset = Math.max((args.offset as number) || 0, 0);
 
     return await executeQuery(
-      `SELECT id, email, name, created_at FROM users ORDER BY id LIMIT $1 OFFSET $2`,
+      `SELECT id, kundennummer, firmenname, kontakt_name, email, telefon, status, created_at FROM kunden ORDER BY id LIMIT $1 OFFSET $2`,
       [limit, offset]
     );
   },
@@ -196,7 +205,7 @@ const toolHandlers: Record<string, (args: Record<string, unknown>) => Promise<un
     if (!email) throw new Error("email ist erforderlich");
 
     const rows = await executeQuery(
-      `SELECT id, email, name, created_at FROM users WHERE email = $1`,
+      `SELECT id, kundennummer, firmenname, kontakt_name, email, telefon, status, created_at FROM kunden WHERE email = $1`,
       [email]
     );
     return rows.length > 0 ? rows[0] : null;

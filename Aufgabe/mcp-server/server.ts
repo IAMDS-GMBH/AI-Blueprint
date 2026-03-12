@@ -40,6 +40,16 @@ function validateWhereClause(clause: string): void {
   }
 }
 
+// Tabellennamen case-insensitiv aufloesen (LLMs senden oft "Kunden" statt "kunden")
+async function resolveTableName(input: string): Promise<string> {
+  const tables = await listTables();
+  const match = tables.find((t) => t.toLowerCase() === input.toLowerCase());
+  if (!match) {
+    throw new Error(`Tabelle '${input}' nicht gefunden oder nicht erlaubt`);
+  }
+  return match;
+}
+
 // MCP-Server Instanz erstellen
 const server = new McpServer({
   name: "schulung-db",
@@ -80,8 +90,7 @@ server.tool(
 // -------------------------------------------------------
 server.tool(
   "query-users",
-  "Gibt eine Liste von Usern zurück. Maximal 50 Einträge. " +
-    "Passwörter werden NICHT zurückgegeben.",
+  "Gibt eine Liste von Kunden zurück. Maximal 50 Einträge.",
   {
     limit: z
       .number()
@@ -89,7 +98,7 @@ server.tool(
       .max(50)
       .optional()
       .default(10)
-      .describe("Anzahl der zurückgegebenen User (max. 50)"),
+      .describe("Anzahl der zurückgegebenen Kunden (max. 50)"),
     offset: z
       .number()
       .min(0)
@@ -99,7 +108,7 @@ server.tool(
   },
   async ({ limit, offset }) => {
     const rows = await executeQuery(
-      `SELECT id, email, name, created_at FROM users ORDER BY id LIMIT $1 OFFSET $2`,
+      `SELECT id, kundennummer, firmenname, kontakt_name, email, telefon, status, created_at FROM kunden ORDER BY id LIMIT $1 OFFSET $2`,
       [limit, offset]
     );
     return {
@@ -110,18 +119,18 @@ server.tool(
 
 // -------------------------------------------------------
 // TOOL: get-user-by-email
-// Sucht einen User anhand der E-Mail-Adresse
+// Sucht einen Kunden anhand der E-Mail-Adresse
 // -------------------------------------------------------
 server.tool(
   "get-user-by-email",
-  "Sucht einen User anhand der E-Mail-Adresse. " +
-    "Gibt null zurück wenn kein User gefunden wurde.",
+  "Sucht einen Kunden anhand der E-Mail-Adresse. " +
+    "Gibt null zurück wenn kein Kunde gefunden wurde.",
   {
-    email: z.string().email().describe("E-Mail-Adresse des gesuchten Users"),
+    email: z.string().email().describe("E-Mail-Adresse des gesuchten Kunden"),
   },
   async ({ email }) => {
     const rows = await executeQuery(
-      `SELECT id, email, name, created_at FROM users WHERE email = $1`,
+      `SELECT id, kundennummer, firmenname, kontakt_name, email, telefon, status, created_at FROM kunden WHERE email = $1`,
       [email]
     );
     const user = rows.length > 0 ? rows[0] : null;
@@ -157,7 +166,8 @@ server.tool(
   {
     tableName: z.string().describe("Name der Tabelle"),
   },
-  async ({ tableName }) => {
+  async ({ tableName: inputTable }) => {
+    const tableName = await resolveTableName(inputTable);
     const schema = await getTableSchema(tableName);
     return {
       content: [{ type: "text", text: JSON.stringify(schema, null, 2) }],
@@ -180,11 +190,8 @@ server.tool(
       .optional()
       .describe("Optionale WHERE-Bedingung (ohne WHERE-Keyword). Nur einfache Bedingungen erlaubt."),
   },
-  async ({ tableName, whereClause }) => {
-    const allowedTables = await listTables();
-    if (!allowedTables.includes(tableName)) {
-      throw new Error(`Tabelle '${tableName}' nicht gefunden oder nicht erlaubt`);
-    }
+  async ({ tableName: inputTable, whereClause }) => {
+    const tableName = await resolveTableName(inputTable);
 
     if (whereClause) {
       validateWhereClause(whereClause);
@@ -228,11 +235,8 @@ server.tool(
       .default(50)
       .describe("Max. Anzahl Zeilen (max 50)"),
   },
-  async ({ tableName, columns, whereClause, limit }) => {
-    const allowedTables = await listTables();
-    if (!allowedTables.includes(tableName)) {
-      throw new Error(`Tabelle '${tableName}' nicht gefunden oder nicht erlaubt`);
-    }
+  async ({ tableName: inputTable, columns, whereClause, limit }) => {
+    const tableName = await resolveTableName(inputTable);
 
     if (whereClause) {
       validateWhereClause(whereClause);

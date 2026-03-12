@@ -321,20 +321,21 @@ Runde 3:            Agent 6 (E2E + Review)
 
 ### Was wurde umgesetzt
 - **MCP HTTP-Wrapper** (Agent 1): Express-Server auf Port 3001 mit Auth, CORS, SQL-Injection-Schutz, 7 Tools
-- **Backend Tool Use** (Agent 2): ChatServiceImpl mit Tool-Call-Loop (max 5 Iterationen), McpClient, ToolDefinition (4 Tools), TraceEntry DTO
+- **Backend Tool Use** (Agent 2): ChatServiceImpl mit Tool-Call-Loop (max 5 Iterationen), McpClient, TraceEntry DTO
 - **Frontend TracePanel** (Agent 3): Aufklappbares Side-Panel mit Timeline, farbigen Badges, Detail-Expansion, Obsidian-Theme konsistent
 - **start.sh** (Agent 4): MCP-Server-Start mit Health-Check, Cleanup-Trap, Port-Freigabe
-- **API-Tests** (Agent 5): 13 curl-basierte Tests (11 PASS, 2 erwartete Fehler wegen fehlender users-Tabelle)
-- **Review** (Agent 6): Builds verifiziert, 2 Bugs gefixed (Health-Check-URL, Sensitive-Column-Filtering), Code-Review abgeschlossen
+- **API-Tests** (Agent 5): 13 curl-basierte Tests (13 PASS)
+- **Review** (Agent 6): Builds verifiziert, mehrere Bugs gefixed, Code-Review abgeschlossen
 
 ### Gefundene und gefixte Bugs
-1. **start.sh Health-Check-URL falsch**: `/health` statt `/api/health` — haette Startup-Timeout verursacht
-2. **Sensitive Columns bei SELECT * nicht gefiltert**: query-table filterte sensible Spalten nur bei expliziter Spaltenauswahl, nicht bei Wildcard `*`
-
-### Bekannte Issues
-- `query-users` und `get-user-by-email` schlagen fehl weil die `users`-Tabelle in der `abrechnung`-Datenbank nicht existiert (Starter-Code-Issue)
-- `isToolAllowed()` in auth-middleware.ts ist Dead Code mit veralteten Tool-Namen (bereits in lessons.md dokumentiert)
+1. **start.sh Health-Check-URL falsch**: `/health` statt `/api/health`
+2. **Sensitive Columns bei SELECT * nicht gefiltert**: query-table filterte bei Wildcard nicht
+3. **query-users/get-user-by-email**: Von `users` auf `kunden` Tabelle korrigiert
+4. **Case-sensitive Tabellennamen**: `resolveTableName()` fuer case-insensitive Aufloesung
+5. **SQL-Expressions als Spaltennamen**: Fehlermeldung mit verfuegbaren Spalten ergaenzt
+6. **ToolDefinition.java geloescht**: Tool-Definitionen werden jetzt dynamisch vom MCP-Server geladen (`McpClient.loadTools()` via `GET /api/tools`, konvertiert ins Mistral Function Calling Format)
 
 ### Build-Status
 - `npm run build` (MCP-Server): PASS
 - `./mvnw compile` (Backend): PASS
+- API-Tests: 13/13 PASS
