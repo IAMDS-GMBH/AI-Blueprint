@@ -41,9 +41,19 @@ watch(
   <div class="chat-container">
     <div ref="messagesContainer" class="messages-list">
       <div v-if="chatStore.messages.length === 0" class="empty-state">
-        <div class="empty-icon">📖</div>
-        <p class="empty-title">&lt;Leeres Buch&gt;</p>
-        <p class="empty-hint">Druecke Enter um zu craften...</p>
+        <div class="empty-glow"></div>
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <rect x="4" y="8" width="40" height="28" rx="6" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+            <path d="M4 18H44" stroke="currentColor" stroke-width="2" opacity="0.15"/>
+            <circle cx="14" cy="26" r="2" fill="currentColor" opacity="0.2"/>
+            <circle cx="22" cy="26" r="2" fill="currentColor" opacity="0.3"/>
+            <circle cx="30" cy="26" r="2" fill="currentColor" opacity="0.2"/>
+            <path d="M18 40L24 34L30 40" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.2"/>
+          </svg>
+        </div>
+        <p class="empty-title">Stelle eine Frage</p>
+        <p class="empty-hint">Schreibe eine Nachricht um den Chat zu starten</p>
       </div>
       <ChatMessage
         v-for="(msg, index) in chatStore.messages"
@@ -51,33 +61,45 @@ watch(
         :message="msg"
       />
       <div v-if="chatStore.loading" class="loading-indicator">
-        <span class="block block-1"></span>
-        <span class="block block-2"></span>
-        <span class="block block-3"></span>
+        <div class="loading-avatar">AI</div>
+        <div class="loading-content">
+          <span class="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </div>
       </div>
     </div>
 
     <div v-if="chatStore.error" class="error-banner">
-      <span class="error-icon">💥</span>
-      {{ chatStore.error }}
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="error-icon">
+        <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 5V9M8 11V11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span>{{ chatStore.error }}</span>
     </div>
 
     <div class="input-area">
       <div class="input-wrapper">
         <textarea
           v-model="inputText"
-          placeholder="> Nachricht eingeben..."
+          placeholder="Nachricht schreiben..."
           rows="1"
           :disabled="chatStore.loading"
           @keydown="handleKeydown"
         ></textarea>
+        <button
+          class="send-button"
+          :disabled="chatStore.loading || !inputText.trim()"
+          @click="handleSend"
+        >
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M3 9H15M15 9L10 4M15 9L10 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
       </div>
-      <button
-        :disabled="chatStore.loading || !inputText.trim()"
-        @click="handleSend"
-      >
-        Craft!
-      </button>
+      <p class="input-hint">Enter zum Senden · Shift+Enter fuer neue Zeile</p>
     </div>
   </div>
 </template>
@@ -87,36 +109,36 @@ watch(
   display: flex;
   flex-direction: column;
   height: 100%;
-  max-width: 850px;
+  max-width: 820px;
   margin: 0 auto;
+  padding: 0 8px;
 }
 
+/* Scrollbar */
 .messages-list {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 16px;
+  padding: 28px 12px 12px;
+  scroll-behavior: smooth;
   scrollbar-width: thin;
-  scrollbar-color: var(--mc-stone-dark) var(--mc-dirt-dark);
+  scrollbar-color: var(--obsidian-border) transparent;
 }
 
 .messages-list::-webkit-scrollbar {
-  width: 12px;
+  width: 6px;
 }
 
 .messages-list::-webkit-scrollbar-track {
-  background: var(--mc-dirt-dark);
-  border-left: 2px solid var(--mc-black);
+  background: transparent;
 }
 
 .messages-list::-webkit-scrollbar-thumb {
-  background: var(--mc-stone);
-  border: 2px solid var(--mc-black);
-  border-top-color: var(--mc-stone-light);
-  border-left-color: var(--mc-stone-light);
+  background: var(--obsidian-border);
+  border-radius: 3px;
 }
 
 .messages-list::-webkit-scrollbar-thumb:hover {
-  background: var(--mc-stone-light);
+  background: var(--text-tertiary);
 }
 
 /* Empty State */
@@ -126,213 +148,220 @@ watch(
   align-items: center;
   justify-content: center;
   height: 100%;
-  gap: 8px;
+  gap: 12px;
+  position: relative;
+}
+
+.empty-glow {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: var(--amber-glow);
+  filter: blur(80px);
+  pointer-events: none;
 }
 
 .empty-icon {
-  font-size: 3rem;
-  animation: float 2s steps(4) infinite alternate;
+  color: var(--amber);
+  opacity: 0.8;
+  animation: float 4s ease-in-out infinite;
 }
 
 @keyframes float {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-8px); }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 
 .empty-title {
-  font-family: 'Silkscreen', monospace;
-  color: var(--mc-gold);
-  font-size: 0.9rem;
-  text-shadow: 2px 2px 0 var(--mc-text-shadow);
-  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .empty-hint {
-  font-family: 'Silkscreen', monospace;
-  color: var(--mc-stone-light);
-  font-size: 0.6rem;
-  text-shadow: 1px 1px 0 var(--mc-text-shadow);
-  margin: 0;
-  animation: blink 1s steps(1) infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
 }
 
 /* Loading */
 .loading-indicator {
   display: flex;
-  gap: 6px;
-  padding: 12px 16px;
-  align-items: flex-end;
+  gap: 10px;
+  padding: 4px 0 12px;
+  align-items: flex-start;
+  animation: message-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.block {
-  width: 14px;
-  height: 14px;
-  border: 2px solid var(--mc-black);
-  animation: block-bounce 1s steps(2) infinite;
+@keyframes message-in {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
-.block-1 {
-  background-color: var(--mc-grass);
-  border-top-color: var(--mc-grass-light);
-  border-left-color: var(--mc-grass-light);
-  animation-delay: 0s;
+.loading-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--amber), var(--amber-dim));
+  color: var(--obsidian);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  margin-top: 20px;
 }
 
-.block-2 {
-  background-color: var(--mc-dirt);
-  border-top-color: var(--mc-dirt-light);
-  border-left-color: var(--mc-dirt-light);
-  animation-delay: 0.2s;
+.loading-content {
+  padding: 14px 18px;
+  background: var(--obsidian-lighter);
+  border: 1px solid var(--obsidian-border);
+  border-radius: var(--radius-md);
+  border-bottom-left-radius: 4px;
+  margin-top: 20px;
 }
 
-.block-3 {
-  background-color: var(--mc-stone);
-  border-top-color: var(--mc-stone-light);
-  border-left-color: var(--mc-stone-light);
-  animation-delay: 0.4s;
+.loading-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
 }
 
-@keyframes block-bounce {
-  0%, 100% {
-    transform: translateY(0) scale(1);
+.loading-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--amber);
+  animation: dot-pulse 1.4s ease-in-out infinite;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes dot-pulse {
+  0%, 80%, 100% {
+    opacity: 0.2;
+    transform: scale(0.8);
   }
-  50% {
-    transform: translateY(-10px) scale(1.1);
+  40% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
 /* Error */
 .error-banner {
-  background-color: #4A1010;
-  color: var(--mc-red);
-  padding: 10px 16px;
-  font-family: 'Silkscreen', monospace;
-  font-size: 0.6rem;
-  text-align: center;
-  text-shadow: 1px 1px 0 var(--mc-black);
-  border-top: 3px solid var(--mc-red);
-  border-bottom: 3px solid var(--mc-black);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  padding: 10px 16px;
+  margin: 0 12px;
+  background: var(--error-bg);
+  border: 1px solid rgba(232, 92, 92, 0.15);
+  border-radius: var(--radius-sm);
+  color: var(--error-red);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  animation: message-in 0.3s ease both;
 }
 
 .error-icon {
-  font-size: 1rem;
+  flex-shrink: 0;
 }
 
 /* Input Area */
 .input-area {
+  padding: 12px 12px 16px;
   display: flex;
-  gap: 8px;
-  padding: 12px 16px;
-  background-color: var(--mc-stone-dark);
-  border-top: 4px solid var(--mc-stone-light);
-  box-shadow: 0 -2px 0 var(--mc-black);
-  position: relative;
-}
-
-.input-area::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 8px,
-      rgba(0,0,0,0.04) 8px,
-      rgba(0,0,0,0.04) 16px
-    );
-  pointer-events: none;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .input-wrapper {
-  flex: 1;
-  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  background: var(--obsidian-lighter);
+  border: 1px solid var(--obsidian-border);
+  border-radius: var(--radius-lg);
+  padding: 4px 4px 4px 18px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.input-area textarea {
-  width: 100%;
-  padding: 10px 14px;
-  background-color: var(--mc-black);
-  color: var(--mc-text);
-  border: 3px solid var(--mc-stone);
-  border-top-color: var(--mc-inventory-border);
-  border-left-color: var(--mc-inventory-border);
-  border-bottom-color: var(--mc-stone-light);
-  border-right-color: var(--mc-stone-light);
-  font-family: 'Silkscreen', monospace;
-  font-size: 0.7rem;
+.input-wrapper:focus-within {
+  border-color: var(--amber-dim);
+  box-shadow: 0 0 0 3px var(--amber-glow), 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.input-wrapper textarea {
+  flex: 1;
+  padding: 10px 0;
+  background: transparent;
+  color: var(--text-primary);
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
   resize: none;
   outline: none;
-  line-height: 1.8;
-  caret-color: var(--mc-gold);
-  text-shadow: 1px 1px 0 rgba(255,255,255,0.1);
+  line-height: 1.5;
+  caret-color: var(--amber);
 }
 
-.input-area textarea::placeholder {
-  color: var(--mc-stone);
-  text-shadow: none;
+.input-wrapper textarea::placeholder {
+  color: var(--text-tertiary);
 }
 
-.input-area textarea:focus {
-  border-color: var(--mc-gold);
-  border-top-color: var(--mc-dirt-dark);
-  border-left-color: var(--mc-dirt-dark);
+.input-wrapper textarea:disabled {
+  color: var(--text-tertiary);
 }
 
-.input-area textarea:disabled {
-  background-color: #2A2A2A;
-  color: var(--mc-stone);
-}
-
-/* Minecraft Button */
-.input-area button {
-  padding: 10px 22px;
-  background-color: var(--mc-grass);
-  color: var(--mc-text);
-  font-family: 'Silkscreen', monospace;
-  font-size: 0.7rem;
-  font-weight: 700;
+.send-button {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--amber), var(--amber-dim));
+  color: var(--obsidian);
+  border: none;
   cursor: pointer;
-  white-space: nowrap;
-  text-shadow: 2px 2px 0 var(--mc-text-shadow);
-  letter-spacing: 1px;
-  border: 3px solid var(--mc-black);
-  border-top-color: var(--mc-grass-light);
-  border-left-color: var(--mc-grass-light);
-  position: relative;
-  transition: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
 }
 
-.input-area button:hover:not(:disabled) {
-  background-color: var(--mc-grass-light);
-  border-top-color: #96E86E;
-  border-left-color: #96E86E;
+.send-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px var(--amber-glow-strong);
 }
 
-.input-area button:active:not(:disabled) {
-  background-color: var(--mc-grass-dark);
-  border-top-color: var(--mc-black);
-  border-left-color: var(--mc-black);
-  border-bottom-color: var(--mc-grass-light);
-  border-right-color: var(--mc-grass-light);
-  transform: translateY(1px);
+.send-button:active:not(:disabled) {
+  transform: scale(0.95);
 }
 
-.input-area button:disabled {
-  background-color: var(--mc-stone-dark);
-  border-top-color: var(--mc-stone);
-  border-left-color: var(--mc-stone);
-  color: var(--mc-stone);
+.send-button:disabled {
+  opacity: 0.25;
   cursor: not-allowed;
-  text-shadow: 1px 1px 0 var(--mc-black);
+}
+
+.input-hint {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: 0 4px;
 }
 </style>

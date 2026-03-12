@@ -11,11 +11,15 @@ defineProps<Props>()
 <template>
   <div class="message-row" :class="message.role">
     <div class="message-block" :class="message.role">
-      <div class="message-avatar" :class="message.role">
-        {{ message.role === 'user' ? '🧑' : '🤖' }}
+      <div class="avatar" :class="message.role">
+        <span v-if="message.role === 'user'">Du</span>
+        <span v-else class="avatar-ai">AI</span>
       </div>
       <div class="message-body">
-        <span class="message-label">{{ message.role === 'user' ? 'Steve' : 'Crafting AI' }}</span>
+        <div class="message-meta">
+          <span class="message-sender">{{ message.role === 'user' ? 'Du' : 'Chatbot' }}</span>
+          <span class="message-time">gerade</span>
+        </div>
         <div class="message-bubble" :class="message.role">
           <p class="message-content">{{ message.content }}</p>
         </div>
@@ -27,18 +31,18 @@ defineProps<Props>()
 <style scoped>
 .message-row {
   display: flex;
-  margin-bottom: 8px;
-  animation: block-place 0.15s steps(3) both;
+  margin-bottom: 4px;
+  animation: message-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-@keyframes block-place {
+@keyframes message-in {
   0% {
     opacity: 0;
-    transform: scale(0.8);
+    transform: translateY(12px);
   }
   100% {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
   }
 }
 
@@ -52,8 +56,8 @@ defineProps<Props>()
 
 .message-block {
   display: flex;
-  gap: 8px;
-  max-width: 75%;
+  gap: 10px;
+  max-width: 72%;
   align-items: flex-start;
 }
 
@@ -61,76 +65,94 @@ defineProps<Props>()
   flex-direction: row-reverse;
 }
 
-.message-avatar {
-  width: 36px;
-  height: 36px;
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 600;
   flex-shrink: 0;
-  border: 3px solid var(--mc-black);
-  image-rendering: pixelated;
+  margin-top: 20px;
 }
 
-.message-avatar.user {
-  background-color: var(--mc-blue);
-  border-top-color: var(--mc-blue-light);
-  border-left-color: var(--mc-blue-light);
+.avatar.user {
+  background: var(--obsidian-lighter);
+  color: var(--text-secondary);
+  border: 1px solid var(--obsidian-border);
 }
 
-.message-avatar.assistant {
-  background-color: var(--mc-grass);
-  border-top-color: var(--mc-grass-light);
-  border-left-color: var(--mc-grass-light);
+.avatar.assistant {
+  background: linear-gradient(135deg, var(--amber), var(--amber-dim));
+  color: var(--obsidian);
+  box-shadow: 0 0 16px var(--amber-glow);
+}
+
+.avatar-ai {
+  letter-spacing: 0.05em;
 }
 
 .message-body {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
-.message-label {
-  font-family: 'Silkscreen', monospace;
-  font-size: 0.55rem;
-  color: var(--mc-gold);
-  text-shadow: 1px 1px 0 var(--mc-text-shadow);
-  padding: 0 4px;
-  letter-spacing: 1px;
+.message-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 2px;
 }
 
-.message-row.user .message-label {
-  text-align: right;
+.message-sender {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.message-time {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+}
+
+.message-row.user .message-meta {
+  flex-direction: row-reverse;
 }
 
 .message-bubble {
-  padding: 10px 14px;
+  padding: 12px 16px;
   word-wrap: break-word;
-  border: 3px solid var(--mc-black);
+  border-radius: var(--radius-md);
   position: relative;
 }
 
 .message-bubble.user {
-  background-color: var(--mc-blue);
-  border-top-color: var(--mc-blue-light);
-  border-left-color: var(--mc-blue-light);
-  color: var(--mc-text);
+  background: linear-gradient(135deg, var(--amber), var(--amber-dim));
+  color: var(--obsidian);
+  border-bottom-right-radius: 4px;
 }
 
 .message-bubble.assistant {
-  background-color: var(--mc-stone);
-  border-top-color: var(--mc-stone-light);
-  border-left-color: var(--mc-stone-light);
-  color: var(--mc-text);
+  background: var(--obsidian-lighter);
+  border: 1px solid var(--obsidian-border);
+  color: var(--text-primary);
+  border-bottom-left-radius: 4px;
 }
 
 .message-content {
   margin: 0;
-  font-family: 'Silkscreen', monospace;
-  font-size: 0.7rem;
-  line-height: 1.8;
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  line-height: 1.6;
   white-space: pre-wrap;
+}
+
+.message-bubble.user .message-content {
+  font-weight: 500;
 }
 </style>
