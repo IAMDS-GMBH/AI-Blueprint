@@ -1,17 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git *)",
-      "Bash(mvn *)",
-      "Bash(npm *)",
-      "Bash(npx *)",
-      "Bash(docker *)",
-      "Bash(flyway *)",
+      "Bash(*)",
       "Read(*)",
       "Write(*)",
       "Edit(*)",
       "Glob(*)",
-      "Grep(*)"
+      "Grep(*)",
+      "Agent(*)",
+      "Skill(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__*"
     ],
     "deny": [
       "Bash(rm -rf *)",

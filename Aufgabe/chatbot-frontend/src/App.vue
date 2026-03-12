@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import ChatView from '@/components/ChatView.vue'
+import { useChatStore } from '@/stores/chat'
+
+const chatStore = useChatStore()
+const traceOpen = computed(() => chatStore.showTrace)
 </script>
 
 <template>
@@ -16,7 +21,7 @@ import ChatView from '@/components/ChatView.vue'
         </span>
       </div>
     </header>
-    <main class="app-main">
+    <main class="app-main" :class="{ 'trace-open': traceOpen }">
       <ChatView />
     </main>
   </div>
@@ -168,5 +173,10 @@ body {
 .app-main {
   flex: 1;
   overflow: hidden;
+  transition: max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-main.trace-open {
+  max-width: 100%;
 }
 </style>

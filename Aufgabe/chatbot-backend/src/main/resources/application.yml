@@ -5,3 +5,7 @@ mistral:
   api-key: ${MISTRAL_API_KEY:}
   model: mistral-small-latest
   api-url: https://api.mistral.ai/v1/chat/completions
+
+mcp:
+  server-url: ${MCP_SERVER_URL:http://localhost:3001}
+  api-key: ${MCP_API_KEY:schulung-secret-key-2026}

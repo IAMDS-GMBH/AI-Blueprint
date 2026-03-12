@@ -33,6 +33,14 @@
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@latest"],
       "description": "Aktuelle Library-Dokumentation direkt in den Kontext laden – kein veraltetes Halluzinieren"
+    },
+    "schulung-db": {
+      "command": "node",
+      "args": ["mcp-server/dist/server.js"],
+      "env": {
+        "DATABASE_URL": "postgresql://training:training@localhost:5432/abrechnung",
+        "MCP_API_KEY": "schulung-secret-key-2026"
+      }
     }
   }
 }

@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { ref, nextTick, watch } from 'vue'
+import { ref, nextTick, watch, computed } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import ChatMessage from '@/components/ChatMessage.vue'
+import TracePanel from '@/components/TracePanel.vue'
 
 const chatStore = useChatStore()
 
 const inputText = ref('')
 const messagesContainer = ref<HTMLElement | null>(null)
+
+const hasTraces = computed(() => chatStore.traceLog.length > 0)
 
 async function handleSend() {
   const text = inputText.value.trim()
@@ -29,6 +32,13 @@ function scrollToBottom() {
   }
 }
 
+function handleMessageClick(index: number) {
+  const traceIndex = Math.floor(index / 2)
+  if (traceIndex < chatStore.traceLog.length) {
+    chatStore.selectTrace(traceIndex)
+  }
+}
+
 watch(
   () => chatStore.messages.length,
   () => {
@@ -38,87 +48,184 @@ watch(
 </script>
 
 <template>
-  <div class="chat-container">
-    <div ref="messagesContainer" class="messages-list">
-      <div v-if="chatStore.messages.length === 0" class="empty-state">
-        <div class="empty-glow"></div>
-        <div class="empty-icon">
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-            <rect x="4" y="8" width="40" height="28" rx="6" stroke="currentColor" stroke-width="2" opacity="0.3"/>
-            <path d="M4 18H44" stroke="currentColor" stroke-width="2" opacity="0.15"/>
-            <circle cx="14" cy="26" r="2" fill="currentColor" opacity="0.2"/>
-            <circle cx="22" cy="26" r="2" fill="currentColor" opacity="0.3"/>
-            <circle cx="30" cy="26" r="2" fill="currentColor" opacity="0.2"/>
-            <path d="M18 40L24 34L30 40" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.2"/>
-          </svg>
-        </div>
-        <p class="empty-title">Stelle eine Frage</p>
-        <p class="empty-hint">Schreibe eine Nachricht um den Chat zu starten</p>
-      </div>
-      <ChatMessage
-        v-for="(msg, index) in chatStore.messages"
-        :key="index"
-        :message="msg"
-      />
-      <div v-if="chatStore.loading" class="loading-indicator">
-        <div class="loading-avatar">AI</div>
-        <div class="loading-content">
-          <span class="loading-dots">
-            <span></span>
-            <span></span>
-            <span></span>
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="chatStore.error" class="error-banner">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="error-icon">
-        <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
-        <path d="M8 5V9M8 11V11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-      <span>{{ chatStore.error }}</span>
-    </div>
-
-    <div class="input-area">
-      <div class="input-wrapper">
-        <textarea
-          v-model="inputText"
-          placeholder="Nachricht schreiben..."
-          rows="1"
-          :disabled="chatStore.loading"
-          @keydown="handleKeydown"
-        ></textarea>
+  <div class="chat-layout">
+    <div class="chat-container">
+      <div class="chat-toolbar">
         <button
-          class="send-button"
-          :disabled="chatStore.loading || !inputText.trim()"
-          @click="handleSend"
+          class="trace-toggle"
+          :class="{ active: chatStore.showTrace }"
+          @click="chatStore.toggleTrace()"
         >
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M3 9H15M15 9L10 4M15 9L10 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <span v-if="hasTraces" class="trace-dot-indicator"></span>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 3H12M2 7H9M2 11H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
           </svg>
+          Trace
         </button>
       </div>
-      <p class="input-hint">Enter zum Senden · Shift+Enter fuer neue Zeile</p>
+
+      <div ref="messagesContainer" class="messages-list">
+        <div v-if="chatStore.messages.length === 0" class="empty-state">
+          <div class="empty-glow"></div>
+          <div class="empty-icon">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <rect x="4" y="8" width="40" height="28" rx="6" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+              <path d="M4 18H44" stroke="currentColor" stroke-width="2" opacity="0.15"/>
+              <circle cx="14" cy="26" r="2" fill="currentColor" opacity="0.2"/>
+              <circle cx="22" cy="26" r="2" fill="currentColor" opacity="0.3"/>
+              <circle cx="30" cy="26" r="2" fill="currentColor" opacity="0.2"/>
+              <path d="M18 40L24 34L30 40" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.2"/>
+            </svg>
+          </div>
+          <p class="empty-title">Stelle eine Frage</p>
+          <p class="empty-hint">Schreibe eine Nachricht um den Chat zu starten</p>
+        </div>
+        <ChatMessage
+          v-for="(msg, index) in chatStore.messages"
+          :key="index"
+          :message="msg"
+          @click="handleMessageClick(index)"
+        />
+        <div v-if="chatStore.loading" class="loading-indicator">
+          <div class="loading-avatar">AI</div>
+          <div class="loading-content">
+            <span class="loading-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="chatStore.error" class="error-banner">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="error-icon">
+          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 5V9M8 11V11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span>{{ chatStore.error }}</span>
+      </div>
+
+      <div class="input-area">
+        <div class="input-wrapper">
+          <textarea
+            v-model="inputText"
+            placeholder="Nachricht schreiben..."
+            rows="1"
+            :disabled="chatStore.loading"
+            @keydown="handleKeydown"
+          ></textarea>
+          <button
+            class="send-button"
+            :disabled="chatStore.loading || !inputText.trim()"
+            @click="handleSend"
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M3 9H15M15 9L10 4M15 9L10 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <p class="input-hint">Enter zum Senden · Shift+Enter fuer neue Zeile</p>
+      </div>
     </div>
+
+    <Transition name="trace-slide">
+      <TracePanel v-if="chatStore.showTrace" />
+    </Transition>
   </div>
 </template>
 
 <style scoped>
+.chat-layout {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
 .chat-container {
   display: flex;
   flex-direction: column;
   height: 100%;
+  flex: 1;
+  min-width: 0;
   max-width: 820px;
   margin: 0 auto;
   padding: 0 8px;
+}
+
+.chat-layout:has(.trace-panel) .chat-container {
+  margin: 0;
+  margin-left: auto;
+}
+
+/* Trace Toggle */
+.chat-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 12px 0;
+  flex-shrink: 0;
+}
+
+.trace-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  background: var(--obsidian-lighter);
+  border: 1px solid var(--obsidian-border);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.trace-toggle:hover {
+  color: var(--text-secondary);
+  border-color: var(--text-tertiary);
+}
+
+.trace-toggle.active {
+  color: var(--amber);
+  border-color: var(--amber-dim);
+  background: var(--amber-glow);
+}
+
+.trace-dot-indicator {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 6px var(--amber-glow-strong);
+}
+
+/* Trace Transition */
+.trace-slide-enter-active {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.trace-slide-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.trace-slide-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.trace-slide-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
 }
 
 /* Scrollbar */
 .messages-list {
   flex: 1;
   overflow-y: auto;
-  padding: 28px 12px 12px;
+  padding: 20px 12px 12px;
   scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: var(--obsidian-border) transparent;
