@@ -1,46 +1,43 @@
-# /swarm – Grosse Aufgabe auf mehrere Agents verteilen
+# /swarm – Aufgabe auf mehrere Agents verteilen
 
-Zerlege eine komplexe Aufgabe in unabhaengige Teilaufgaben und verteile sie auf spezialisierte Agents.
+Aufgabe: $ARGUMENTS
 
-## Ablauf
+Zerlege eine komplexe Aufgabe in Teilaufgaben fuer spezialisierte Agents.
+IMPORTANT: Auf Freigabe warten bevor Agents gestartet werden.
 
-1. Aufgabe analysieren und in parallele, unabhaengige Teilaufgaben zerlegen
-2. Fuer jede Teilaufgabe den passenden Agent bestimmen
-3. Swarm-Plan ausgeben (Uebersicht was welcher Agent macht)
-4. Auf Freigabe warten
-5. Nach Freigabe: Jeden Agent mit seiner Aufgabe und dem passenden Kontext starten
-6. Ergebnisse zusammenfuehren
-7. /review ausfuehren um das Gesamtergebnis zu pruefen
+## Agent-Empfehlung
+| Task-Typ | Agent |
+|----------|-------|
+| Code schreiben/aendern | Dev Agent |
+| Tests schreiben | Test Agent |
+| Docs/ADRs erstellen | Docs Agent |
+| Code pruefen (read-only) | Review Agent |
 
-## Swarm-Plan Format
-
+## MUST: Swarm-Reihenfolge (verbindlich)
 ```
-## Swarm-Plan: [AUFGABENNAME]
+1. Dev Agent(s)    → Feature-Implementierung (parallel wenn unabhaengig)
+2. Test Agent(s)   → Tests schreiben (NACH Dev Agents)
+3. Review Agent    → Gesamtreview + lessons.md Update (IMMER als Letzter)
+```
 
-### Aufgaben-Aufteilung
+## Regeln
+- Test Agents sind PFLICHT — kein Swarm ohne Tests
+- Max 5 parallele Agents
+- Schnittstellen zwischen Agents explizit definieren — NEVER raten
+- Review Agent MUST tasks/lessons.md als letzten Schritt aktualisieren
+
+## Output-Format
+```
+## Swarm-Plan: [AUFGABE]
 
 | Agent | Typ | Aufgabe | Abhaengig von |
 |-------|-----|---------|---------------|
-| Agent 1 | Dev | [Beschreibung] | – |
-| Agent 2 | Dev | [Beschreibung] | – |
-| Agent 3 | Test | [Beschreibung] | Agent 1, Agent 2 |
-| Agent 4 | Docs | [Beschreibung] | Agent 1 |
-| Agent 5 | Review | Gesamtreview | Alle |
+| 1 | Dev | [...] | – |
+| 2 | Test | [...] | Agent 1 |
+| 3 | Review | Gesamtreview | Alle |
 
-### Reihenfolge
-Runde 1 (parallel): Agent 1, Agent 2
-Runde 2 (parallel): Agent 3, Agent 4
-Runde 3: Agent 5 (Review)
-
-### Geschaetzter Gesamtaufwand
-[X Agents × Y Minuten = Z Minuten]
-
----
-[ ] Swarm freigegeben
+Reihenfolge:
+Runde 1: Agent 1 (parallel)
+Runde 2: Agent 2
+Runde 3: Agent 3 (Review)
 ```
-
-## Constraints
-- Jede Teilaufgabe muss unabhaengig ausfuehrbar sein
-- Abhaengigkeiten explizit dokumentieren
-- Review-Agent immer am Ende einsetzen
-- Nie mehr als 5 parallele Agents (Qualitaet leidet)

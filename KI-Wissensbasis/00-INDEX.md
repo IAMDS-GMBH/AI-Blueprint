@@ -1,7 +1,7 @@
 # 🧠 KI-Wissensbasis – Unternehmens-Übersicht
 
 > **Stand:** März 2026 | **Quelle:** Interne Recherche & Analyse
-> Diese Wissensbasis strukturiert alle gesammelten KI-Themen in 17 Kategorien + Code Modernisierung.
+> Diese Wissensbasis strukturiert alle gesammelten KI-Themen in 18 Kategorien + Code Modernisierung.
 
 ---
 
@@ -25,6 +25,7 @@
 | 14 | [14-KI-Strategie-und-Mindset.md](14-KI-Strategie-und-Mindset.md) | **KI Strategie & Mindset** | Sam Altman, Zukunft Software Engineering, Core Principles |
 | 15 | [15-Agent-Einsatz-im-Entwicklungsalltag.md](15-Agent-Einsatz-im-Entwicklungsalltag.md) | **Agent-Einsatz Praxis** | Agents aufrufen, Workflow mit Agents, MCP+Skills+Commands Zusammenspiel, Szenarien |
 | 17 | [17-Mistral-Teams-und-Ecosystem.md](17-Mistral-Teams-und-Ecosystem.md) | **Mistral Teams & Ecosystem** | Mistral Vibe CLI, Devstral 2, Codestral, Le Chat, Continue.dev, MCP-Support |
+| 18 | [18-KI-optimierte-Tickets.md](18-KI-optimierte-Tickets.md) | **KI-optimierte Tickets** | KERNEL auf Tickets, Templates (Feature/Bug/Refactoring), Vorher/Nachher, Ticketsystem-Integration |
 | CM | [Code_Modernization/code-modernization-playbook.md](Code_Modernization/code-modernization-playbook.md) | **Code Modernisierung** | COBOL-Migration, Strangler Fig, ROI, Phased Cutover, Swarm fuer Migration |
 
 ---

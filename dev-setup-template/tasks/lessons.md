@@ -1,33 +1,24 @@
-# Lessons Learned – [PROJEKTNAME / TEAM]
+# Lessons Learned
 
-> Dieses Dokument wird nach jeder Korrektur durch den User oder nach einem Fehler aktualisiert.
-> Ziel: Denselben Fehler nie zweimal machen.
-> Die KI liest diese Datei zu Beginn jeder neuen Session.
-
----
+> Nach jeder Korrektur/Fehler sofort aktualisieren. Nie denselben Fehler zweimal.
+> KI liest diese Datei bei Session-Start.
 
 ## Format
-
 ```
-### [DATUM] – [Kurztitel des Fehlers]
-**Was passierte:** [Beschreibung was schiefging]
-**Root Cause:** [Eigentliche Ursache]
-**Regel fuer die Zukunft:** [Konkrete Regel die diesen Fehler verhindert]
+### [DATUM] – [Kurztitel]
+**Problem:** [Was schiefging]
+**Ursache:** [Root Cause]
+**Regel:** [Konkrete Regel fuer die Zukunft]
 ```
-
----
-
-## Eintragen wenn:
-- Der User eine Korrektur vornimmt
-- Ein Deployment-Fehler aufgetreten ist
-- Ein Missverstaendnis zu unnoetigem Aufwand gefuehrt hat
-- Eine Annahme falsch war
-
----
 
 ## Lessons
 
-### [DATUM] – Beispieleintrag (loeschen wenn erste echte Lesson eingetragen)
-**Was passierte:** KI hat ein Feature implementiert das nicht im Scope war
-**Root Cause:** Aufgabenbeschreibung war zu vage, KI hat eigene Annahmen getroffen
-**Regel:** Immer zuerst /plan ausfuehren und Scope explizit definieren bevor Code geschrieben wird
+### BEISPIEL – Lombok-Version inkompatibel mit Java 21+
+**Problem:** `mvn compile` schlug fehl mit Lombok-Fehler
+**Ursache:** Spring Boot Default-Lombok zu alt fuer Java 21+
+**Regel:** Bei Java 21+ Lombok-Version explizit auf 1.18.44+ pinnen
+
+### BEISPIEL – Swarm ohne Tests
+**Problem:** Swarm hatte nur Dev + Review, keine Tests
+**Ursache:** Test Agent nicht im Plan vorgesehen
+**Regel:** Swarm-Reihenfolge: Dev → Test → Review. Tests sind Pflicht.

@@ -20,10 +20,10 @@ Pflegt und erweitert die KI-Wissensdatenbank (KI-Wissensbasis/).
 - Neue KI-Tools oder Technologien dokumentieren
 - Bestehende Artikel aktualisieren (z.B. neue Modellversionen)
 - Recherche zu KI-Themen fuer die Wissensbasis
-- Pruefen ob Schulungsinhalte noch zur Wissensbasis passen
+- Pruefen ob Template betroffen ist (neue Tools → Template-Agents/Skills updaten?)
 
 ## Kontext
-- 16 Artikel mit Prioritaeten (HOCH/MITTEL/NIEDRIG)
+- 17+ Artikel mit Prioritaeten (HOCH/MITTEL/NIEDRIG)
 - Index in 00-INDEX.md
 - Artikel folgen einheitlichem Format: Thema, Links, Relevanz, Aktionsitems
 
@@ -31,12 +31,9 @@ Pflegt und erweitert die KI-Wissensdatenbank (KI-Wissensbasis/).
 1. Vor neuen Artikeln: 00-INDEX.md pruefen ob Thema schon existiert
 2. Quellen angeben (Links, Datum)
 3. Praktische Empfehlungen am Ende jedes Themas
-4. Nach Aenderungen: Pruefen ob Schulung betroffen ist
+4. Nach Aenderungen: Pruefen ob dev-setup-template betroffen ist
 
 ## Constraints
 - Keine unbelegten Behauptungen
 - Prioritaeten nur nach Relevanz fuer Entwicklerteams vergeben
 - Bestehende Artikel nicht loeschen, nur aktualisieren
-
-## Output-Format
-Markdown-Dateien im Format der bestehenden Wissensbasis-Artikel

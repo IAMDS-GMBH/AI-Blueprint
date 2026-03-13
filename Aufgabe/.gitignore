@@ -1,0 +1,33 @@
+# === Java / Maven ===
+*.class
+*.jar
+*.war
+*.ear
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# === Node / npm ===
+node_modules/
+dist/
+*.tsbuildinfo
+
+# === IDE ===
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# === Environment / Secrets ===
+.env
+.env.*
+!.env.example
+
+# === Logs ===
+*.log
+logs/
+
+# === OS ===
+Thumbs.db

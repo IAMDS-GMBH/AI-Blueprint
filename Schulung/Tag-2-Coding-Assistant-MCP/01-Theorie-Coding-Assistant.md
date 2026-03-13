@@ -487,7 +487,112 @@ Konkret: Endpunkt + Body + Response +
 
 ---
 
-## 11. Praktischer Alltags-Workflow
+## 11. KI-optimierte Tickets schreiben
+
+Das mächtigste Pattern aus Abschnitt 10 hat eine Voraussetzung: **Die Aufgabe muss klar beschrieben sein.** Im Team-Alltag kommen Aufgaben aber nicht als Prompt — sondern als Ticket. Und hier scheitern die meisten KI-Workflows.
+
+### 11a. Das Problem: Warum normale Tickets für KI nicht reichen
+
+Traditionelle Tickets setzen auf implizites Teamwissen:
+- Mündliche Absprachen aus dem Sprint-Meeting
+- Kontext den "jeder im Team kennt"
+- Erfahrung mit dem Projekt und seinen Eigenheiten
+
+**KI-Assistenten haben keinen Zugang zu diesem impliziten Wissen.**
+
+```
+Ticket: "Performance der Suche verbessern"
+
+Mensch denkt: "Ah, die Elasticsearch-Query im ProductService ist langsam,
+              Max hat letzte Woche Indizes angelegt, soll unter 200ms."
+
+KI sieht:    "Performance der Suche verbessern"
+              → Welche Suche? Welches Modul? Was ist "gut genug"?
+              → KI fragt nach oder rät falsch
+```
+
+**Ergebnis:** KI fragt 5x nach, stoppt, oder baut am Bedarf vorbei.
+
+### 11b. KERNEL auf Tickets anwenden
+
+Das KERNEL-Framework (aus Tag 1) gilt nicht nur für Prompts — es ist die ideale Checkliste für Tickets:
+
+| KERNEL-Prinzip | Anwendung auf Tickets |
+|---|---|
+| **K**eep simple | Ein Ticket = eine klar abgegrenzte Änderung |
+| **E**xplicit constraints | Was NICHT gemacht werden soll (Scope-Grenzen) |
+| **R**eproducible | Versionen, Branch, Environment explizit nennen |
+| **N**arrow scope | Kein "und außerdem..." — separates Ticket |
+| **E**asy to verify | Akzeptanzkriterien als Checkliste oder Given/When/Then |
+| **L**ogical structure | Kontext → Anforderung → Constraints → Erfolg |
+
+### 11c. Template: KI-optimiertes Ticket
+
+```markdown
+## Titel: [Bereich] Aktion + Ziel
+   Beispiel: "Auth: Password-Reset Token per E-Mail senden"
+
+### Kontext
+- Betroffene Dateien/Module: src/auth/...
+- Tech-Stack: Spring Boot 3.2, PostgreSQL (aus CLAUDE.md)
+- Abhängigkeiten: Braucht Feature X (Ticket #123)
+
+### Anforderung
+- WAS gebaut werden soll (nicht WIE)
+- Endpunkte, Felder, Verhalten
+
+### Akzeptanzkriterien
+- [ ] POST /api/v1/auth/forgot-password sendet E-Mail
+- [ ] Token läuft nach 24h ab
+- [ ] Test: Happy Path + Token expired
+
+### Scope-Grenzen
+- NICHT: Frontend-Änderungen (separates Ticket)
+- NICHT: E-Mail-Template-Design
+```
+
+> Weitere Varianten (Bug-Ticket, Refactoring-Ticket) → siehe KI-Wissensbasis Artikel 18.
+
+### 11d. Vorher/Nachher-Vergleich
+
+**Vorher — vages Ticket:**
+```
+Titel: Login verbessern
+Beschreibung: Der Login soll besser werden. Bitte auch an Security denken.
+
+→ KI fragt 5x nach ("Was heißt besser?", "Welcher Auth-Mechanismus?")
+→ Baut OAuth2 statt JWT (geraten)
+→ Ignoriert bestehende Patterns
+→ Ergebnis passt nicht zum Stack
+```
+
+**Nachher — KI-optimiertes Ticket:**
+```
+Titel: Auth: JWT Refresh-Token Rotation implementieren
+Kontext: Spring Boot 3.2, Spring Security 6.x, jjwt 0.12
+Anforderung: Access-Token (15min) + Refresh-Token (7d) mit Rotation
+Akzeptanzkriterien:
+- [ ] POST /api/v1/auth/refresh rotiert Refresh-Token
+- [ ] Altes Refresh-Token wird invalidiert
+- [ ] Test: Happy Path, Expired Token, Reuse Detection
+Scope-Grenzen: NICHT Frontend, NICHT OAuth2
+
+→ KI startet sofort, nutzt korrekte Dependencies, hält Scope ein
+→ Akzeptanzkriterien werden 1:1 zu Tests
+```
+
+### 11e. Praxis-Tipps
+
+- **Ticket schreiben = Prompt schreiben** → KERNEL gilt
+- **Akzeptanzkriterien werden 1:1 zu Tests** — KI generiert Testmethoden direkt daraus
+- **Tech-Kontext spart Tokens** — KI muss nicht im Repo suchen
+- **"Definition of Done" explizit machen** — nicht "es soll funktionieren"
+- **Im Team: Ticket-Template in Jira/Linear/GitHub einrichten** — einmal aufsetzen, alle profitieren
+- **Review-Frage:** "Könnte ein neuer Entwickler (oder KI) das ohne Rückfragen umsetzen?"
+
+---
+
+## 12. Praktischer Alltags-Workflow
 
 ```
 Morgens:
@@ -508,7 +613,7 @@ Abends / nach Korrekturen:
 
 ---
 
-## Übung: Coding Assistant ohne Repo (→ Aufgabendatei)
+## 13. Übung: Coding Assistant ohne Repo (→ Aufgabendatei)
 
 Ihr erhaltet gleich eine Aufgabe die ihr lösen sollt,
 aber NUR mit folgenden Informationen (kein Repository-Zugriff):

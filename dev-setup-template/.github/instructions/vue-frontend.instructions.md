@@ -1,13 +1,13 @@
 ---
-applyTo: "**/*.vue,**/*.ts,**/*.js"
+applyTo: "**/*.vue,**/*.ts"
 ---
 
-# Vue.js 3 + TypeScript Standards
+<!-- Kurzfassung — vollstaendige Rules in .claude/rules/examples/vue-frontend.md -->
 
-- Composition API (`<script setup>`) – keine Options API in neuem Code
-- Komponenten: PascalCase, Single Responsibility
-- Props immer mit TypeScript-Types definieren (`defineProps<{...}>()`)
-- Kein direkter API-Call in Komponenten – immer via Pinia Store oder Composable
-- CSS: Scoped styles (`<style scoped>`) – keine globalen Overrides
-- Kein `any` in TypeScript ohne explizite Begründung
-- Axios-Calls immer in eigenem Service/Composable kapseln
+# Vue.js 3 + TypeScript
+
+- Composition API (`<script setup lang="ts">`) — NEVER Options API
+- Props typisieren: defineProps<Props>()
+- NEVER direkter API-Call in Komponenten — via Store/Composable
+- CSS: `<style scoped>` — keine globalen Overrides
+- NEVER v-html mit User-Daten (XSS)

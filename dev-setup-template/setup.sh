@@ -11,6 +11,7 @@
 #   bash setup.sh copilot mistral        # Copilot + Mistral
 #   bash setup.sh --all                  # Alles
 #   bash setup.sh --update claude        # Update nur Claude
+#   bash setup.sh claude /pfad/zu/projekt  # Mit Ziel-Verzeichnis
 # =============================================================================
 
 set -e
@@ -31,7 +32,17 @@ for arg in "$@"; do
     copilot)   INSTALL_COPILOT=true; TOOLS_SPECIFIED=true ;;
     mistral)   INSTALL_MISTRAL=true; TOOLS_SPECIFIED=true ;;
     --all)     INSTALL_CLAUDE=true; INSTALL_COPILOT=true; INSTALL_MISTRAL=true; TOOLS_SPECIFIED=true ;;
-    *)         echo "Unbekanntes Argument: $arg"; echo "Nutzung: bash setup.sh [--update] [claude] [copilot] [mistral] [--all]"; exit 1 ;;
+    /*)        TARGET_DIR="$arg" ;;
+    ./*)       TARGET_DIR="$arg" ;;
+    ../*)      TARGET_DIR="$arg" ;;
+    ~*)        TARGET_DIR="$arg" ;;
+    *)
+      if [[ -d "$arg" ]]; then
+        TARGET_DIR="$arg"
+      else
+        echo "Unbekanntes Argument: $arg"; echo "Nutzung: bash setup.sh [--update] [claude] [copilot] [mistral] [--all] [/pfad/zu/projekt]"; exit 1
+      fi
+      ;;
   esac
 done
 
@@ -50,9 +61,7 @@ echo ""
 echo "Ziel-Verzeichnis: ${TARGET_DIR}"
 echo ""
 
-# -----------------------------------------------------------------------------
-# Interaktive Auswahl (wenn kein Tool angegeben)
-# -----------------------------------------------------------------------------
+# Interaktive Auswahl
 if [[ "$TOOLS_SPECIFIED" == false ]]; then
   echo -e "${CYAN}Welche Tools moechtest du einrichten?${NC}"
   echo ""
@@ -77,13 +86,11 @@ if [[ "$TOOLS_SPECIFIED" == false ]]; then
   echo ""
 fi
 
-# Mindestens ein Tool muss gewaehlt sein
 if [[ "$INSTALL_CLAUDE" == false && "$INSTALL_COPILOT" == false && "$INSTALL_MISTRAL" == false ]]; then
   echo "Kein Tool ausgewaehlt. Abbruch."
   exit 1
 fi
 
-# Auswahl anzeigen
 SELECTED=""
 [[ "$INSTALL_CLAUDE"  == true ]] && SELECTED+="Claude Code, "
 [[ "$INSTALL_COPILOT" == true ]] && SELECTED+="GitHub Copilot, "
@@ -93,10 +100,7 @@ echo -e "${GREEN}Ausgewaehlt: ${SELECTED}${NC}"
 [[ "$UPDATE_MODE" == true ]] && echo -e "${YELLOW}Modus: --update (bestehende Dateien werden ueberschrieben)${NC}"
 echo ""
 
-# -----------------------------------------------------------------------------
 # Hilfsfunktionen
-# -----------------------------------------------------------------------------
-
 copy_if_not_exists() {
   local src="$1"
   local dest="$2"
@@ -136,11 +140,9 @@ TOTAL_STEPS=0
 [[ "$INSTALL_CLAUDE"  == true ]] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
 [[ "$INSTALL_COPILOT" == true ]] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
 [[ "$INSTALL_MISTRAL" == true ]] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
-TOTAL_STEPS=$((TOTAL_STEPS + 2))  # Gemeinsame Dateien + Zusammenfassung
+TOTAL_STEPS=$((TOTAL_STEPS + 2))  # Gemeinsame Dateien + Fertig
 
-# -----------------------------------------------------------------------------
 # Claude Code
-# -----------------------------------------------------------------------------
 if [[ "$INSTALL_CLAUDE" == true ]]; then
   STEP=$((STEP + 1))
   echo -e "${BLUE}[${STEP}/${TOTAL_STEPS}] Claude Code${NC}"
@@ -149,44 +151,44 @@ if [[ "$INSTALL_CLAUDE" == true ]]; then
   copy_dir_merge "$SCRIPT_DIR/.claude/commands" "$TARGET_DIR/.claude/commands"
   copy_dir_merge "$SCRIPT_DIR/.claude/skills"   "$TARGET_DIR/.claude/skills"
   copy_dir_merge "$SCRIPT_DIR/.claude/rules"    "$TARGET_DIR/.claude/rules"
+  copy_dir_recursive "$SCRIPT_DIR/.claude/rules/examples" "$TARGET_DIR/.claude/rules/examples"
+  copy_dir_merge "$SCRIPT_DIR/.claude/hooks"    "$TARGET_DIR/.claude/hooks"
+  # Verfuegbare Stack-Rules (werden von /configure aktiviert)
+  copy_dir_recursive "$SCRIPT_DIR/stacks" "$TARGET_DIR/.claude/rules/stacks"
   copy_if_not_exists "$SCRIPT_DIR/.claude/settings.json" "$TARGET_DIR/.claude/settings.json"
   copy_if_not_exists "$SCRIPT_DIR/.mcp.json"    "$TARGET_DIR/.mcp.json"
   copy_if_not_exists "$SCRIPT_DIR/CLAUDE.md"    "$TARGET_DIR/CLAUDE.md"
   echo ""
 fi
 
-# -----------------------------------------------------------------------------
 # GitHub Copilot
-# -----------------------------------------------------------------------------
 if [[ "$INSTALL_COPILOT" == true ]]; then
   STEP=$((STEP + 1))
   echo -e "${BLUE}[${STEP}/${TOTAL_STEPS}] GitHub Copilot${NC}"
 
-  copy_dir_merge "$SCRIPT_DIR/.github/agents"          "$TARGET_DIR/.github/agents"
-  copy_dir_merge "$SCRIPT_DIR/.github/instructions"    "$TARGET_DIR/.github/instructions"
-  copy_dir_merge "$SCRIPT_DIR/.github/copilot-prompts" "$TARGET_DIR/.github/copilot-prompts"
+  copy_dir_merge "$SCRIPT_DIR/.github/agents"       "$TARGET_DIR/.github/agents"
+  copy_dir_merge "$SCRIPT_DIR/.github/instructions" "$TARGET_DIR/.github/instructions"
+  # Verfuegbare Stack-Instructions (werden von /configure aktiviert)
+  copy_dir_recursive "$SCRIPT_DIR/stacks" "$TARGET_DIR/.github/instructions/stacks"
   copy_if_not_exists "$SCRIPT_DIR/.github/copilot-instructions.md" "$TARGET_DIR/.github/copilot-instructions.md"
-  copy_if_not_exists "$SCRIPT_DIR/.vscode/mcp.json"    "$TARGET_DIR/.vscode/mcp.json"
+  mkdir -p "$TARGET_DIR/.github/copilot-prompts"
+  copy_if_not_exists "$SCRIPT_DIR/.github/copilot-prompts/configure.prompt.md" "$TARGET_DIR/.github/copilot-prompts/configure.prompt.md"
+  copy_if_not_exists "$SCRIPT_DIR/.vscode/mcp.json"  "$TARGET_DIR/.vscode/mcp.json"
   echo ""
 fi
 
-# -----------------------------------------------------------------------------
 # Mistral Vibe
-# -----------------------------------------------------------------------------
 if [[ "$INSTALL_MISTRAL" == true ]]; then
   STEP=$((STEP + 1))
   echo -e "${BLUE}[${STEP}/${TOTAL_STEPS}] Mistral Vibe${NC}"
 
   copy_if_not_exists "$SCRIPT_DIR/.vibe/config.toml" "$TARGET_DIR/.vibe/config.toml"
   copy_dir_merge "$SCRIPT_DIR/.vibe/agents"          "$TARGET_DIR/.vibe/agents"
-  copy_dir_recursive "$SCRIPT_DIR/.vibe/skills"      "$TARGET_DIR/.vibe/skills"
   copy_if_not_exists "$SCRIPT_DIR/AGENTS.md"         "$TARGET_DIR/AGENTS.md"
   echo ""
 fi
 
-# -----------------------------------------------------------------------------
-# Gemeinsame Dateien (immer)
-# -----------------------------------------------------------------------------
+# Gemeinsame Dateien
 STEP=$((STEP + 1))
 echo -e "${BLUE}[${STEP}/${TOTAL_STEPS}] Gemeinsame Dateien${NC}"
 
@@ -194,56 +196,32 @@ copy_if_not_exists "$SCRIPT_DIR/MEMORY.md"           "$TARGET_DIR/MEMORY.md"
 copy_if_not_exists "$SCRIPT_DIR/tasks/lessons.md"    "$TARGET_DIR/tasks/lessons.md"
 copy_if_not_exists "$SCRIPT_DIR/tasks/todo.md"       "$TARGET_DIR/tasks/todo.md"
 
-# -----------------------------------------------------------------------------
 # Zusammenfassung
-# -----------------------------------------------------------------------------
 STEP=$((STEP + 1))
 echo ""
-echo -e "${BLUE}[${STEP}/${TOTAL_STEPS}] Zusammenfassung${NC}"
-
-COPIED=$(find "$TARGET_DIR" -newer "$SCRIPT_DIR/setup.sh" -type f 2>/dev/null | wc -l | tr -d ' ')
-echo -e "  ${GREEN}OK${NC}    Setup abgeschlossen"
-
+echo -e "${BLUE}[${STEP}/${TOTAL_STEPS}] Fertig${NC}"
 echo ""
 echo -e "${BLUE}========================================${NC}"
 echo -e "${GREEN}  Setup abgeschlossen!${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
-# -----------------------------------------------------------------------------
-# Naechste Schritte (kontextabhaengig)
-# -----------------------------------------------------------------------------
 echo -e "${YELLOW}NAECHSTE SCHRITTE:${NC}"
 echo ""
-
+echo "  1. cd $TARGET_DIR"
+echo "  2. KI-Tool starten und /configure ausfuehren:"
 if [[ "$INSTALL_CLAUDE" == true ]]; then
-  echo -e "  ${CYAN}Claude Code:${NC}"
-  echo "    - CLAUDE.md anpassen: [COMPANY NAME], [BRANCHE], Tech Stack"
-  echo "    - .mcp.json: Tokens eintragen (GITHUB_TOKEN, POSTGRES_CONNECTION_STRING)"
-  echo "    - Plugins aktivieren:"
-  echo "      /plugin install context7@claude-plugins-official"
-  echo "      /plugin install security-guidance@claude-plugins-official"
-  echo ""
+  echo "     Claude Code:  /configure"
 fi
-
 if [[ "$INSTALL_COPILOT" == true ]]; then
-  echo -e "  ${CYAN}GitHub Copilot:${NC}"
-  echo "    - .github/copilot-instructions.md anpassen: [COMPANY NAME], [BRANCHE]"
-  echo "    - .vscode/mcp.json: Tokens eintragen"
-  echo ""
+  echo "     Copilot:      @workspace /configure"
 fi
-
 if [[ "$INSTALL_MISTRAL" == true ]]; then
-  echo -e "  ${CYAN}Mistral Vibe:${NC}"
-  echo "    - AGENTS.md anpassen: [COMPANY NAME], [BRANCHE], Tech Stack"
-  echo "    - .vibe/config.toml: Tokens eintragen"
-  echo "    - Vibe installieren (falls noch nicht vorhanden):"
-  echo "      curl -LsSf https://mistral.ai/vibe/install.sh | bash"
-  echo "      export MISTRAL_API_KEY=your-key-here"
-  echo ""
+  echo "     Vibe:         vibe --agent configure"
 fi
-
-echo "  MEMORY.md anpassen: [COMPANY NAME], [PROJECT NAME]"
+echo ""
+echo "  /configure erkennt euren Tech-Stack automatisch und"
+echo "  passt alle Dateien an (Placeholders, Rules, MCP)."
 echo ""
 echo "  Was ihr nicht braucht, koennt ihr einfach loeschen."
 echo ""

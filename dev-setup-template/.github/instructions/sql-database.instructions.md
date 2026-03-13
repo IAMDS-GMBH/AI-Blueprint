@@ -1,21 +1,13 @@
 ---
-applyTo: "**/*.sql,**/migration/*.java,**/migrations/**"
+applyTo: "**/*.sql,**/migrations/**"
 ---
 
-# Datenbank-Standards
+<!-- Kurzfassung — vollstaendige Rules in .claude/rules/examples/db-sql.md -->
 
-## Oracle
-- Tabellennamen: UPPER_CASE, Plural (`CUSTOMER_ORDERS`)
-- Spaltennamen: UPPER_CASE
-- Keine SQL-reserved-words als Bezeichner
-- Constraints benennen: `CONSTRAINT FK_ORDER_CUSTOMER FOREIGN KEY ...`
+# Datenbank & SQL
 
-## PostgreSQL
-- snake_case für alle Bezeichner (Tabellen, Spalten, Indizes)
-- Timestamps: `TIMESTAMPTZ` statt `TIMESTAMP`
-
-## Beide
-- Kein `SELECT *` in Produktion
-- Alle Schema-Änderungen via Flyway Migration – niemals manuell in DB
-- Migration-Naming: `V001__create_table.sql`, `V002__add_column.sql`
-- Indizes für alle Foreign Keys und häufig gefilterten Spalten
+- Alle Schema-Aenderungen via Flyway Migration — NEVER manuell
+- Migration-Naming: V001__create_table.sql
+- NEVER SELECT * in Produktion
+- NEVER bestehende Migration editieren
+- Indizes fuer alle Foreign Keys

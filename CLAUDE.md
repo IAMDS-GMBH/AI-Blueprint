@@ -1,65 +1,25 @@
-# CLAUDE.md – AI-Blueprint (Schulung & Wissensbasis)
+# CLAUDE.md — AI-Blueprint
 
-> Diese Datei wird bei jeder KI-Session automatisch geladen.
-
----
-
-## Projekt
-
-**Name:** AI-Blueprint
-**Zweck:** 3-taegige KI-Schulung fuer Entwickler + umfassende KI-Wissensdatenbank + portables Dev-Setup-Template
-**Sprache der Inhalte:** Deutsch
-
----
+> KI-Wissensbasis + Dev-Setup-Template fuer Entwicklerteams | Deutsch
 
 ## Projektstruktur
+- **dev-setup-template/** — Portables KI-Setup (Claude/Copilot/Vibe, Tech-Stacks, setup.sh)
+- **KI-Wissensbasis/** — 17+ Artikel zu AI & Entwicklung (LLMs, Tools, Security, MCP, Agents)
+- **Schulung/** — ARCHIV (abgeschlossener 3-Tage-Kurs, nur lesen)
 
-```
-AI-Blueprint/
-  KI-Wissensbasis/        # 16 Artikel zu AI & Entwicklung (LLMs, Tools, Security, MCP, etc.)
-  Schulung/               # 3-taegiger Kurs (Theorie + Hands-on)
-    Tag-1-Greenfield/     # LLM-Basics, KERNEL-Framework, Chatbot (Spring Boot + Vue.js)
-    Tag-2-Coding-Assistant-MCP/  # Context-Hierarchie, MCP-Server fuer Oracle DB
-    Tag-3-Migration/      # Code-Modernisierung, COBOL → Java
-    PowerPoint-Prompts/   # Prompts fuer PPT-Generierung pro Tag
-  dev-setup-template/     # Portables Template fuer Schulungsteilnehmer (setup.sh)
-  CLAUDE.md               # Diese Datei
-```
-
----
-
-## Konventionen fuer Inhalte
-
-### Schulungs-Dateien (Schulung/)
-- Theorie-Dateien: Klar strukturiert mit nummerierten Abschnitten
-- Aufgaben-Dateien: Schrittweise Anleitungen mit Zeitangaben
-- Sprache: Verstaendlich, praxisnah, du-Form fuer Teilnehmer
-- Code-Beispiele: Vollstaendig und lauffaehig
-- Referenzen zur KI-Wissensbasis wo sinnvoll
-
-### Wissensbasis-Dateien (KI-Wissensbasis/)
-- Jeder Artikel mit Prioritaet (HOCH/MITTEL/NIEDRIG)
-- Praktische Empfehlungen am Ende jedes Themas
-- Aktionsitems als Checkboxen
-
-### Dev-Setup-Template (dev-setup-template/)
-- Template fuer beliebige Projekte, kopiert via setup.sh
-- CLAUDE.md dort ist ein Template mit [PLACEHOLDER]-Werten
-- Nicht fuer dieses Repo gedacht, sondern fuer Zielprojekte
-
----
+## Prioritaeten
+1. Template optimieren — Stacks, Config-Sync, Agent-Qualitaet
+2. Wissensbasis pflegen — neue Tools/Erkenntnisse dokumentieren
+3. Developer-Support — Fragen zu AI-Tools und Best Practices beantworten
 
 ## Arbeitsweise
-
-- Vor Aenderungen an Schulungsinhalten: Konsistenz mit KI-Wissensbasis pruefen
-- KERNEL-Framework ist der zentrale Prompting-Standard der Schulung
-- Aenderungen am dev-setup-template muessen auch in der Schulungs-Theorie reflektiert werden
-- Bei neuen KI-Erkenntnissen: Wissensbasis aktualisieren, dann pruefen ob Schulung betroffen
-
----
+- Template: .claude/ + .github/ + .vibe/ immer synchron halten (Triple-Config)
+- Neue Stacks: stacks/ + techstack.conf + setup.sh zusammen aendern
+- Wissensbasis: Zuerst updaten, dann pruefen ob Template betroffen
+- Schulung/ ist Archiv — nur lesen, nicht aendern
+- Details zu Konventionen → siehe Rules und Skills
 
 ## Session-Start
-
-1. `MEMORY.md` lesen (in ~/.claude/projects/.../memory/)
-2. Bei Schulungsaenderungen: Abhaengigkeiten zwischen den 3 Tagen beachten
-3. Bei Template-Aenderungen: setup.sh und README.md synchron halten
+1. MEMORY.md lesen
+2. tasks/todo.md pruefen
+3. Bei Template-Arbeit: setup.sh und README.md im Blick
