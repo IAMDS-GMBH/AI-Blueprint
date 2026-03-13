@@ -1,302 +1,168 @@
 # AI Workspace Setup – [COMPANY NAME]
 
-> Vollstaendige KI-Konfiguration fuer alle Teams.
-> Ein Script bringt alles in dein Projekt – Claude Code, GitHub Copilot und Mistral Vibe ready.
-
----
+> KI-Konfiguration fuer Entwicklerteams. Ein Script → Claude Code, GitHub Copilot und Mistral Vibe ready.
 
 ## Quickstart
 
 ```bash
-# Repo klonen (einmalig, z.B. neben euren Projekten)
-git clone https://[euer-server]/ai-knowledgebase.git
+# AI-Blueprint auschecken (einmalig)
+git clone <AI-Blueprint-Repo>
 
-# In euer Projekt wechseln und Setup ausfuehren
-cd mein-projekt
-bash ../ai-knowledgebase/dev-setup-template/setup.sh
+# In euer Projekt kopieren
+bash /pfad/zu/dev-setup-template/setup.sh claude /pfad/zu/mein-projekt
 ```
 
-Das Script fragt interaktiv welche Tools eingerichtet werden sollen:
-```
-Welche Tools moechtest du einrichten?
-
-  1) Claude Code        (.claude/, CLAUDE.md, .mcp.json)
-  2) GitHub Copilot     (.github/, .vscode/mcp.json)
-  3) Mistral Vibe       (.vibe/, AGENTS.md)
-  4) Alle drei
-
-Auswahl (z.B. 1,3 oder 4):
-```
-
-Alternativ direkt per Argument:
+Interaktive Auswahl oder direkt per Argument:
 ```bash
-bash setup.sh claude              # Nur Claude Code
-bash setup.sh copilot mistral     # Copilot + Mistral
-bash setup.sh --all               # Alle drei
+bash setup.sh claude /pfad/zu/projekt          # Nur Claude Code
+bash setup.sh copilot mistral /pfad/zu/projekt  # Copilot + Mistral
+bash setup.sh --all /pfad/zu/projekt            # Alle drei
+bash setup.sh --update claude /pfad/zu/projekt  # Update bestehende Installation
 ```
 
-Danach Platzhalter in der jeweiligen Config-Datei ersetzen und loslegen.
+> Ohne Pfadangabe wird das aktuelle Verzeichnis verwendet.
 
-Das Script:
-- Kopiert nur die Dateien fuer das gewaehlte Tool
-- Legt `MEMORY.md`, `tasks/lessons.md` und `tasks/todo.md` immer an (gemeinsam genutzt)
-- Ueberspringt Dateien die bereits existieren (kein Ueberschreiben!)
+## Nach dem Setup — /configure
 
----
+Nach dem Kopieren: KI-Tool starten und `/configure` ausfuehren.
+Der Befehl erkennt automatisch euren Tech-Stack und passt alle Dateien an.
 
-## Updates einspielen
+| Tool | Aufruf |
+|------|--------|
+| Claude Code | `/configure` |
+| GitHub Copilot | `@workspace /configure` |
+| Mistral Vibe | `vibe --agent configure` |
 
-```bash
-# Repo aktualisieren
-cd ai-knowledgebase && git pull
+### Was /configure macht
+1. **Erkennt installierte Tools** — prueft ob .claude/, .github/, .vibe/ vorhanden
+2. **Erkennt den Tech-Stack** — analysiert pom.xml, package.json, angular.json, etc.
+3. **Aktiviert passende Rules** — kopiert Stack-Rules aus stacks/ in die aktiven Ordner
+4. **Ersetzt Placeholders** — [COMPANY NAME], [PROJECT NAME], [STACK] in allen Config-Dateien
+5. **Initialisiert MEMORY.md** — traegt Stack und Projektstruktur ein
 
-# Update ins Projekt einspielen (nur fuer die genutzten Tools)
-cd mein-projekt
-bash ../ai-knowledgebase/dev-setup-template/setup.sh --update claude
-bash ../ai-knowledgebase/dev-setup-template/setup.sh --update --all
-```
+Bei leerem Repo fragt /configure interaktiv nach Stack-Details.
+Bei bereits konfiguriertem Projekt bietet /configure Feintuning an.
 
-**Was --update aktualisiert:** Agents, Rules, Skills, Commands, MCP-Configs des gewaehlten Tools
-
-**Was --update NICHT anfasst:** `CLAUDE.md`, `AGENTS.md`, `MEMORY.md`, `.github/copilot-instructions.md`,
-`tasks/lessons.md`, `tasks/todo.md`, `.claude/settings.json`, `.vibe/config.toml`
-
----
-
-## Git Subtree (automatische Updates im Team)
-
-Fuer Teams die Updates direkt im Projekt-Repository tracken wollen:
-
-```bash
-# Einmalig hinzufuegen
-git subtree add --prefix=.ki-setup \
-  https://[euer-server]/ai-knowledgebase.git main --squash
-
-# Spaeter updaten – alle bekommen es via git pull
-git subtree pull --prefix=.ki-setup \
-  https://[euer-server]/ai-knowledgebase.git main --squash
-
-# Setup ausfuehren
-bash .ki-setup/dev-setup-template/setup.sh --update
-```
-
-Tipp: Als Makefile-Target anlegen:
-```makefile
-ki-update:
-	cd .ki-setup && git pull
-	bash .ki-setup/dev-setup-template/setup.sh --update
-```
-Dann reicht `make ki-update` fuer alle.
-
----
-
-## Was wird installiert?
+## Was wird installiert
 
 ```
 .claude/
-  agents/        # Dev, Test, Review, Docs, Knowledge Agent (Claude Code)
-  commands/      # /plan, /review, /swarm, /ralph, /brief, /automate
-  rules/         # Auto-Standards: Java (*.java), Vue (*.vue), SQL (*.sql)
-  skills/        # Dev-Standards, Frontend-Design, Document-Creation
-  settings.json  # Permissions + Plugins vorkonfiguriert
+  agents/        dev, test, review, docs (4 Agents)
+  commands/      /plan, /review, /swarm, /configure (4 Commands)
+  rules/         quality.md (alwaysApply) + stacks/ (verfuegbare Stack-Rules)
+  skills/        verification, standards, debugging (3 Skills)
+  hooks/         format-on-save.sh, protect-secrets.sh
+  settings.json  Permissions, Hooks, Plugins
 
 .github/
-  agents/        # @DevAgent @TestAgent @ReviewAgent @DocsAgent @KnowledgeAgent
-  copilot-instructions.md  # Copilot-Konfiguration + Security + Ralph-Loop
+  agents/          @DevAgent @TestAgent @ReviewAgent @DocsAgent
+  instructions/    stacks/ (verfuegbare Stack-Instructions)
+  copilot-prompts/ configure.prompt.md
+  copilot-instructions.md
 
 .vibe/
-  config.toml    # Mistral Vibe Projekt-Config (Modell, MCP-Server, Permissions)
-  agents/        # Dev, Test, Review, Docs, Knowledge Agent (TOML)
-  skills/        # dev-standards, frontend-design, ceo-brief, automation-design,
-                 # document-creation, agent-orchestration (SKILL.md Format)
+  agents/        dev, test, review, docs, configure (TOML)
+  config.toml    Modell + MCP
 
-.mcp.json              # MCP Server: Playwright, GitHub, PostgreSQL, Context7, Figma
-.vscode/mcp.json       # Gleiche Server fuer VS Code / GitHub Copilot
-
-CLAUDE.md              # Unternehmens-Kontext fuer Claude Code (ANPASSEN!)
-AGENTS.md              # Unternehmens-Kontext fuer Mistral Vibe (ANPASSEN!)
-MEMORY.md              # KI-Langzeitgedaechtnis fuer dieses Projekt (wird NIE ueberschrieben)
-tasks/lessons.md       # Team-Learnings (wird NIE ueberschrieben)
-tasks/todo.md          # Task-Plan (wird NIE ueberschrieben)
+CLAUDE.md        Haupt-Config (Claude Code)
+AGENTS.md        Haupt-Config (Copilot + Vibe)
+MEMORY.md        KI-Langzeitgedaechtnis
+.mcp.json        MCP Server (context7 Default)
+tasks/           lessons.md + todo.md
 ```
 
----
+## Verfuegbare Stacks
 
-## Nach dem Setup: Platzhalter anpassen
+| Stack | Ordner | Inhalt |
+|-------|--------|--------|
+| Java Spring Boot | stacks/java-spring/ | Rules + Snippets |
+| Vue.js 3 + TS | stacks/vue-typescript/ | Rules + Snippets |
+| React + TS | stacks/react-typescript/ | Rules + Snippets |
+| Angular | stacks/angular/ | Rules + Snippets |
+| Python FastAPI | stacks/python-fastapi/ | Rules + Snippets |
+| .NET / C# | stacks/dotnet/ | Rules + Snippets |
+| Oracle DB | stacks/oracle-db/ | Rules + Snippets |
+| PostgreSQL | stacks/postgresql/ | Rules + Snippets |
+| Node + Hono + Bun | stacks/node-hono/ | Rules + Snippets |
+| COBOL (Migration) | stacks/cobol/ | Rules + Snippets |
 
-| Datei | Was anpassen |
-|-------|-------------|
-| `CLAUDE.md` | `[COMPANY NAME]`, `[BRANCHE]`, CI/CD, Hosting, Monitoring |
-| `AGENTS.md` | `[COMPANY NAME]`, `[BRANCHE]` (gleiche Werte wie CLAUDE.md) |
-| `MEMORY.md` | `[COMPANY NAME]`, `[PROJECT NAME]`, initiale Architekturentscheidungen |
-| `.github/copilot-instructions.md` | Gleiche Platzhalter wie CLAUDE.md |
-| `.mcp.json` | `POSTGRES_CONNECTION_STRING`, `GITHUB_TOKEN`, `FIGMA_TOKEN` |
-| `.vscode/mcp.json` | Gleiche Tokens |
+> Stacks werden von setup.sh mitkopiert. /configure aktiviert die passenden automatisch.
 
----
-
-## Claude Code Plugins aktivieren (einmalig pro Projekt)
-
-Im Projektverzeichnis in Claude Code ausfuehren:
-
-```
-/plugin install ralph-loop@claude-plugins-official
-/plugin install context7@claude-plugins-official
-/plugin install security-guidance@claude-plugins-official
-/plugin install typescript-lsp@claude-plugins-official
-/plugin install jdtls-lsp@claude-plugins-official
-```
-
-Plugins werden in `.claude/settings.json` gespeichert und bleiben bei `--update` erhalten.
-
----
-
-## Slash Commands (Claude Code)
-
-| Command | Wann verwenden |
-|---------|----------------|
-| `/plan` | Aufgaben mit mehr als 3 Schritten: erst planen, dann ausfuehren |
-| `/review` | Vor jedem PR-Merge |
-| `/swarm` | 3+ unabhaengige Tasks parallel |
-| `/ralph` | Qualitaets-Check vor Commit (Vollstaendig? Korrekt? Sicher?) |
-| `/brief` | Status-Zusammenfassung fuer Management |
-| `/automate` | Automatisierungspotenzial analysieren |
-
----
-
-## Copilot Agents
-
-| Agent | Aufruf | Wann |
-|-------|--------|------|
-| DevAgent | `@DevAgent` | Feature-Implementierung, Bug Fixes |
-| TestAgent | `@TestAgent` | Unit Tests, E2E Tests, Coverage |
-| ReviewAgent | `@ReviewAgent` | Code Review vor PR-Merge |
-| DocsAgent | `@DocsAgent` | API-Docs, ADRs, Onboarding |
-| KnowledgeAgent | `@KnowledgeAgent` | KI-Tools, Best Practices |
-
----
-
-## Mistral Vibe (optional)
-
-Falls euer Team **Mistral Teams Lizenzen** hat, koennt ihr Mistral Vibe als CLI-Agent nutzen.
-Vibe arbeitet parallel zu Claude Code im selben Repo (`.claude/` und `.vibe/` stoeren sich nicht).
-
-### Installation
-
-```bash
-curl -LsSf https://mistral.ai/vibe/install.sh | bash
-export MISTRAL_API_KEY=your-key-here
-vibe
-```
-
-### Was ist konfiguriert
-
-| Datei | Zweck |
-|-------|-------|
-| `.vibe/config.toml` | Modell (Devstral 2), MCP-Server, Tool-Permissions |
-| `.vibe/agents/*.toml` | 5 Agents: Dev, Test, Review, Docs, Knowledge |
-| `.vibe/skills/*/SKILL.md` | 6 Skills (gleiche wie Claude Code) |
-| `AGENTS.md` | Projekt-Kontext fuer Vibe (Pendant zu CLAUDE.md) |
-
-### Vibe Agents
-
-**Projekt-Agents** (gleiche Rollen wie Claude Code):
-
-| Agent | Aufruf | Wann |
-|-------|--------|------|
-| Dev Agent | `vibe --agent dev` | Feature-Implementierung, Bug Fixes |
-| Test Agent | `vibe --agent test` | Unit Tests, E2E Tests, Coverage |
-| Review Agent | `vibe --agent review` | Code Review vor PR-Merge |
-| Docs Agent | `vibe --agent docs` | API-Docs, ADRs, Onboarding |
-| Knowledge Agent | `vibe --agent knowledge` | KI-Wissensbasis, Best Practices |
-
-**Built-in Agents:**
-
-| Agent | Aufruf | Wann |
-|-------|--------|------|
-| default | `vibe` | Allgemeine Tasks (fragt vor Tool-Ausfuehrung) |
-| plan | `vibe --agent plan` | Nur Planung, keine Code-Aenderungen |
-| accept-edits | `vibe --agent accept-edits` | Auto-Akzeptieren von Edits |
-| auto-approve | `vibe --agent auto-approve` | Alle Tools automatisch genehmigt |
-
-### Feature-Paritaet: Claude Code vs. Mistral Vibe vs. GitHub Copilot
-
-| Feature | Claude Code | Mistral Vibe | GitHub Copilot |
-|---------|------------|--------------|----------------|
-| Haupt-Config | `CLAUDE.md` | `AGENTS.md` + `.vibe/config.toml` | `copilot-instructions.md` |
-| Agents | `.claude/agents/*.md` (5) | `.vibe/agents/*.toml` (5) | `.github/agents/*.md` (5) |
-| Skills | `.claude/skills/*.md` (6) | `.vibe/skills/*/SKILL.md` (6) | – |
-| Rules | `.claude/rules/*.md` (3) | – (integriert in AGENTS.md) | `.github/instructions/*.md` (3) |
-| Commands | `.claude/commands/*.md` (6) | – (Vibe hat kein Command-System) | `.github/prompts/*.md` (4) |
-| MCP | `.mcp.json` | `config.toml [[mcp_servers]]` | `.vscode/mcp.json` |
-
----
-
-## MCP Server
-
-| Server | Zweck | Token noetig? |
-|--------|-------|---------------|
-| `playwright` | Browser-Tests, E2E, Verifikation im Browser | Nein |
-| `github` | PRs, Issues, Repos | `GITHUB_TOKEN` |
-| `context7` | Aktuelle Library-Docs (kein Halluzinieren) | Nein |
-| `figma` | Design-to-Code, Vue-Komponenten | `FIGMA_TOKEN` |
-| `postgres` | DB-Queries, Schema-Analyse | `POSTGRES_CONNECTION_STRING` |
-
----
-
-## GSD (Get Shit Done) — Optionales Add-on
-
-GSD ist ein Spec-Driven-Development-System fuer Claude Code. Es loest das Problem von **Context Rot**
-(Qualitaetsverlust bei langen Sessions) durch atomare Plaene die jeweils in einem frischen Context-Window laufen.
-
-**Wann GSD nutzen:**
-- Grosse Features (10+ Dateien, mehrere Tage Arbeit)
-- Greenfield-Projekte (neues Repo von Null aufbauen)
-- Komplexe Migrationen mit vielen Modulen
-
-**Wann NICHT:**
-- Kleine Bug-Fixes, einzelne Features (unsere `/plan` + `/review` Commands reichen)
-- Ad-hoc-Fragen und Exploration
-
-### Installation (einmalig)
-
-```bash
-npx get-shit-done-cc@latest
-# → Waehle "Claude Code" + "Local" (pro Projekt) oder "Global" (alle Projekte)
-```
-
-Verifizieren: In Claude Code `/gsd:help` ausfuehren.
-
-### Wie GSD unser Setup ergaenzt
-
-| Ebene | dev-setup-template | GSD |
-|---|---|---|
-| Projekt-Kontext | CLAUDE.md, MEMORY.md | PROJECT.md, STATE.md |
-| Code-Standards | Rules (Java, Vue, SQL) | — |
-| Agents | Dev, Test, Review, Docs | 12 spezialisierte Agents |
-| Workflow (klein) | /plan, /review, /ralph | — |
-| Workflow (gross) | /swarm | /gsd:plan-phase, /gsd:execute-phase |
-| MCP-Server | Playwright, GitHub, Oracle | — |
-| Context-Management | — | Frischer Context pro Task |
-
-**Empfehlung:** Fuer den Alltag unsere Commands nutzen. Fuer grosse Projekte GSD aktivieren.
-
-### GSD-Kernbefehle
+## Architektur — Warum so?
 
 ```
-/gsd:new-project        — Neues Projekt initialisieren (Research + Roadmap)
-/gsd:map-codebase       — Bestehendes Projekt analysieren
-/gsd:plan-phase N       — Phase N planen (atomare Task-Plaene)
-/gsd:execute-phase N    — Phase N ausfuehren (parallele Waves, frischer Context)
-/gsd:verify-work N      — Ergebnisse verifizieren
-/gsd:quick              — Ad-hoc Tasks ohne vollen Overhead
-/gsd:pause-work         — Session unterbrechen + spaeter fortsetzen
+CLAUDE.md (~60 Zeilen)     Verhalten + Session-Protokoll    → JEDE Nachricht
+Rules quality.md           Security + Qualitaet              → JEDE Nachricht (alwaysApply)
+Rules mit Globs            Code-Konventionen                 → NUR bei passenden Dateien
+Agents                     Rollen (erben CLAUDE.md + Rules)  → NUR bei Agent-Aufruf
+Commands                   Workflows                         → NUR bei /command
+Skills                     Wissen on-demand                  → NUR bei Bedarf
+Hooks                      Automatisierung                   → 0 Tokens
 ```
 
----
+**Token-Optimierung:** CLAUDE.md wird bei JEDER Nachricht geladen.
+Alles was nicht bei jeder Interaktion gebraucht wird → Rules/Skills/Commands.
 
-## Weiterentwicklung
+## Best Practices — Wie konfigurieren
 
-Neue Erkenntnisse → `tasks/lessons.md`
-Neue Team-Standards → `CLAUDE.md` + `.github/copilot-instructions.md`
-Neuer Agent/Skill → in diesem Repo ergaenzen, dann `--update` an alle verteilen
+### CLAUDE.md
+- Erste 20 Zeilen = wichtigste Regeln (Attention-Bias)
+- Imperativ: "Fix bugs autonom" statt "Du solltest versuchen..."
+- Verbote > Empfehlungen: "NEVER double fuer Geld" wirkt staerker
+- Konkret: "max 30 Zeilen/Methode" statt "halte Methoden kurz"
+- Keine Code-Beispiele (→ Rules), keine Erklaerungen warum
+
+### Rules
+- alwaysApply=true NUR fuer universelle Regeln (max 3)
+- Globs so spezifisch wie moeglich: "src/**/*.java" statt "**/*.java"
+- DOs und DON'Ts zusammen, nicht getrennte Dateien
+
+### Agents
+- Erben CLAUDE.md + Rules automatisch → NIE Konventionen wiederholen
+- Nur definieren: Rolle, Verhalten, Output-Format (max 35 Zeilen)
+- Frontmatter nutzen: description, maxTurns, disallowedTools (z.B. Review Agent = read-only)
+
+### Skills
+- trigger-when fuer automatisches Laden (z.B. "User fragt nach Tests" → standards-Skill)
+- Skills bleiben on-demand — kein Token-Overhead wenn nicht getriggert
+
+### Hooks
+- Kosten 0 Tokens — laufen ausserhalb des Kontextfensters
+- format-on-save: Automatisches Formatting nach Edit/Write
+- protect-secrets: Blockiert Zugriff auf .env, credentials, Secrets
+
+### Settings
+- deny-Rules fuer destruktive Operationen (rm -rf, push --force, DROP, TRUNCATE)
+- Hooks-Sektion verbindet Pre/PostToolUse mit Hook-Scripts
+
+### Anti-Patterns
+- Tech-Konventionen in CLAUDE.md → Rules mit Globs
+- Gleicher Inhalt in Agent + CLAUDE.md → Agent erbt automatisch
+- Mehr als 3 alwaysApply-Rules → Token-Explosion
+
+## Slash Commands
+
+| Command | Wann |
+|---------|------|
+| /plan | Aufgaben mit 3+ Schritten planen |
+| /review | Vor jedem PR-Merge |
+| /swarm | Grosse Aufgabe auf Agents verteilen |
+| /configure | Nach setup.sh: Stack erkennen, Rules aktivieren, Placeholders ersetzen |
+
+## Context-Management
+
+- /compact bei 70% Auslastung (Qualitaet sinkt ab 70%)
+- /clear zwischen unrelateden Tasks
+- Sub-Agents fuer Research (Hauptkontext sauber halten)
+
+## Feature-Paritaet
+
+| Feature | Claude Code | Copilot | Vibe |
+|---------|------------|---------|------|
+| Config | CLAUDE.md | copilot-instructions.md + CLAUDE.md (Fallback) | AGENTS.md |
+| Agents | .claude/agents/ (4) | .github/agents/ (4) | .vibe/agents/ (5) |
+| Rules | .claude/rules/ | .github/instructions/ | — (in AGENTS.md) |
+| Commands | .claude/commands/ (4) | — | — |
+| Skills | .claude/skills/ (3) | — | — |
+| MCP | .mcp.json | .vscode/mcp.json | config.toml |
+| /configure | .claude/commands/ | .github/copilot-prompts/ | .vibe/agents/configure.toml |

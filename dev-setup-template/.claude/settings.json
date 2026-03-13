@@ -2,33 +2,68 @@
   "permissions": {
     "allow": [
       "Bash(git *)",
+      "Bash(./mvnw *)",
       "Bash(mvn *)",
       "Bash(npm *)",
       "Bash(npx *)",
-      "Bash(docker *)",
-      "Bash(flyway *)",
+      "Bash(bun *)",
+      "Bash(bunx *)",
+      "Bash(gradle *)",
+      "Bash(./gradlew *)",
+      "Bash(dotnet *)",
+      "Bash(python *)",
+      "Bash(pip *)",
+      "Bash(go *)",
+      "Bash(cargo *)",
+      "Bash(docker compose *)",
+      "Bash(docker build *)",
+      "Bash(cat *)",
+      "Bash(ls *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(chmod *)",
       "Read(*)",
-      "Write(*)",
       "Edit(*)",
+      "Write(*)",
       "Glob(*)",
       "Grep(*)"
     ],
     "deny": [
       "Bash(rm -rf *)",
-      "Bash(DROP *)",
-      "Bash(DELETE FROM *)"
+      "Bash(git push --force *)",
+      "Bash(git reset --hard *)",
+      "Bash(*DROP *)",
+      "Bash(*DELETE FROM *)",
+      "Bash(*TRUNCATE *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/format-on-save.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Read|Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/protect-secrets.sh"
+          }
+        ]
+      }
     ]
   },
   "enabledPlugins": {
-    "frontend-design@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true,
-    "code-review@claude-plugins-official": true,
-    "ralph-loop@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true,
-    "commit-commands@claude-plugins-official": true,
-    "security-guidance@claude-plugins-official": true,
-    "figma@claude-plugins-official": true,
-    "jdtls-lsp@claude-plugins-official": true
+    "commit-commands@claude-plugins-official": true
   }
 }

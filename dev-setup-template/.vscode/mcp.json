@@ -1,43 +1,10 @@
 {
   "servers": {
-    "playwright": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"],
-      "description": "Browser-Automatisierung und E2E-Testing"
-    },
-    "github": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_TOKEN": "${env:GITHUB_TOKEN}"
-      },
-      "description": "GitHub Integration – PRs, Issues, Repos"
-    },
-    "figma": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "figma-mcp-server"],
-      "env": {
-        "FIGMA_TOKEN": "${env:FIGMA_TOKEN}"
-      },
-      "description": "Design-to-Code Pipeline aus Figma"
-    },
-    "postgres": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres"],
-      "env": {
-        "POSTGRES_CONNECTION_STRING": "${env:POSTGRES_CONNECTION_STRING}"
-      },
-      "description": "PostgreSQL Direktzugriff für Queries und Schema-Analyse"
-    },
     "context7": {
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@latest"],
-      "description": "Aktuelle Library-Dokumentation – kein veraltetes Halluzinieren"
+      "description": "Aktuelle Library-Dokumentation"
     }
   }
 }

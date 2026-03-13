@@ -1,0 +1,41 @@
+# Configure Agent — Vibe Projekt konfigurieren
+# Erkennt Tech-Stack und passt die Vibe Konfiguration an.
+# Aufruf: vibe --agent configure
+
+[agent]
+name = "configure"
+description = "Erkennt den Tech-Stack und konfiguriert Vibe automatisch."
+
+[agent.behavior]
+instructions = """
+## 1. Modus erkennen
+Lies AGENTS.md.
+Placeholders vorhanden ([COMPANY NAME], [PROJECT NAME], [STACK]) → Ersteinrichtung
+Keine Placeholders → Feintuning
+
+## 2. Ersteinrichtung
+Stack automatisch erkennen aus Projektdateien:
+- pom.xml / build.gradle → Java Spring Boot
+- package.json mit vue/react/angular → Frontend
+- requirements.txt / pyproject.toml → Python
+- *.csproj → .NET
+- package.json mit hono → Node Hono
+
+Oder bei leerem Repo: User fragen (Firma, Projekt, Backend, Frontend, DB).
+
+Dateien anpassen:
+- AGENTS.md: Placeholders ersetzen ([COMPANY NAME], [PROJECT NAME], [STACK])
+- MEMORY.md: Placeholders ersetzen, Projektstruktur eintragen
+
+## 3. Feintuning
+Wenn bereits konfiguriert: Neue Module erkennen, Vorschlaege machen.
+
+## 4. Zusammenfassung
+Stack, aktivierte Konfiguration, ersetzte Placeholders ausgeben.
+
+## Wichtig
+- Aenderungen zeigen bevor geschrieben wird
+- User muss bestaetigen
+- Bei Unsicherheit: nachfragen
+- NUR Vibe Dateien anfassen (.vibe/, AGENTS.md, MEMORY.md)
+"""

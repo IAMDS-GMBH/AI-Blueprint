@@ -2,15 +2,14 @@
 applyTo: "**/*.java"
 ---
 
-# Java Spring Standards
+<!-- Kurzfassung — vollstaendige Rules in .claude/rules/examples/java-spring.md -->
 
-- Java 17+, keine deprecated APIs
-- Services immer via Interface abstrahieren (`UserService` → `UserServiceImpl`)
-- DTOs für API-Layer – Entities nie direkt in Response-Body exposen
-- Exception Handling ausschließlich via `@ControllerAdvice`
-- Logging: SLF4J + Logback – kein `System.out.println`
-- Keine Magic Numbers, keine hardcodierten Credentials
-- Methoden max. 30 Zeilen – danach aufteilen
-- `@PreAuthorize` für alle gesicherten Endpoints
-- Input-Validierung via `@Valid` + Bean Validation
-- SQL-Queries: PreparedStatements / JPA – keine String-Konkatenation
+# Java Spring
+
+- Services via Interface abstrahieren
+- DTOs fuer API — Entities NEVER direkt exposen
+- Constructor Injection via @RequiredArgsConstructor
+- Exception Handling via @RestControllerAdvice
+- @PreAuthorize fuer alle Endpoints
+- Input: @Valid + Bean Validation
+- NEVER @Autowired auf Feldern, NEVER System.out.println
