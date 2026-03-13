@@ -1,6 +1,6 @@
 # Tag 1 – Aufgabe: KI-Chatbot bauen
 
-**Arbeitsverzeichnis:** `Aufgaben/` (vorbereitet, wird ueber alle 3 Tage weiterverwendet)
+**Arbeitsverzeichnis:** `Aufgabe/` (vorbereitet, wird ueber alle 3 Tage weiterverwendet)
 
 ---
 
@@ -13,7 +13,7 @@ Frontend (Chat-UI)
     ↓ POST /api/v1/chat
 Backend (Spring Boot)
     ↓
-LLM API (Claude / Mistral)
+LLM API (Mistral, alternativ Claude)
     ↓
 Antwort erscheint im Chat
 ```
@@ -24,21 +24,37 @@ Antwort erscheint im Chat
 
 ## 1. Projekt anlegen und KI-Setup einrichten
 
-### Backend-Projekt erstellen
+### Projektstruktur (Zielzustand)
 
-```bash
-cd Aufgaben
-mkdir chatbot-backend && cd chatbot-backend
 ```
+Aufgabe/
+  .claude/          # KI-Setup (einmal einrichten)
+  chatbot-backend/  # Java Spring Boot
+  chatbot-frontend/ # Vue.js 3
+  tasks/            # Planung + Lessons
+  start.sh          # Orchestrierung (alle Services)
+  .env              # API-Keys
+  .gitignore
+```
+
+> Das KI-Setup wird einmal im Root `Aufgabe/` ausgefuehrt — nicht pro Unterordner.
 
 ### KI-Setup ausfuehren
 
 ```bash
+cd Aufgabe
 bash <pfad-zum>/dev-setup-template/setup.sh
 ```
 
 Das Script fragt, welches Tool eingerichtet werden soll (Claude Code, GitHub Copilot oder Mistral Vibe).
 Alternativ direkt als Argument: `setup.sh claude`, `setup.sh copilot` oder `setup.sh mistral`.
+
+### Backend-Projekt erstellen
+
+```bash
+cd Aufgabe
+mkdir chatbot-backend && cd chatbot-backend
+```
 
 ### Projekt-Konfiguration anpassen
 
@@ -51,6 +67,18 @@ Relevante Informationen:
 - Wie ist die Infrastruktur aufgebaut (Ports, CORS, API-Key-Handling)?
 
 > Je praeziser der Kontext, desto bessere Ergebnisse.
+
+> **LLM-API: Mistral**
+>
+> | Eigenschaft | Wert |
+> |-------------|------|
+> | Endpoint | `https://api.mistral.ai/v1/chat/completions` |
+> | Model | `mistral-large-latest` |
+> | Environment Variable | `MISTRAL_API_KEY` |
+> | API-Format | OpenAI-kompatibel (Messages-Array, roles, etc.) |
+>
+> Mistral verwendet dasselbe Request-Format wie die OpenAI API.
+> Alternativ kann auch die Claude API verwendet werden — dann Endpoint und Model entsprechend anpassen.
 
 ---
 
@@ -77,6 +105,16 @@ Vor der Implementierung im **Plan Mode** einen Umsetzungsplan erstellen lassen:
 
 Den generierten Plan pruefen, dann umsetzen lassen.
 
+### Bekannte Stolpersteine
+
+> Diese Punkte stammen aus den Lessons Learned und sparen Zeit bei der Implementierung:
+
+- **Lombok-Version:** Spring Boot 3.2 liefert Lombok 1.18.30 — das ist inkompatibel mit Java 21+. Lombok-Version explizit auf **1.18.44+** setzen und `maven-compiler-plugin` mit Lombok Annotation Processor konfigurieren.
+- **Maven Wrapper:** Immer `./mvnw` statt `mvn` verwenden. Das macht das Projekt portabel und vermeidet Probleme mit fehlender Maven-Installation.
+- **`.gitignore` von Anfang an anlegen:** `target/`, `node_modules/`, `.env`, `.DS_Store`, `.idea/`, `.vscode/` — sonst landen Artefakte und Secrets im Repository.
+- **Kein `set -e` in Start-Scripts:** Bei Scripts die Hintergrundprozesse managen bricht `set -e` bei harmlosen Fehlern ab (z.B. `kill` auf bereits beendete Prozesse).
+- **Port-Kill braucht Polling:** Nach `kill -9` ist der Port nicht sofort frei. Immer aktiv warten bis `lsof` den Port als frei meldet (`free_port`-Funktion mit Retry-Loop).
+
 ### Akzeptanzkriterien
 
 - [ ] `POST /api/v1/chat` liefert eine LLM-Antwort zurueck
@@ -90,11 +128,11 @@ Den generierten Plan pruefen, dann umsetzen lassen.
 ## 3. Frontend aufsetzen und implementieren
 
 ```bash
-cd Aufgaben
+cd Aufgabe
 mkdir chatbot-frontend && cd chatbot-frontend
 ```
 
-KI-Setup erneut ausfuehren und Konfigurationsdatei fuer das Frontend-Projekt anpassen.
+KI-Konfigurationsdatei fuer das Frontend-Projekt anpassen (die Konfiguration im Root `Aufgabe/` wird weiterverwendet).
 
 ### Anforderungen
 
@@ -113,12 +151,42 @@ Auch hier: Plan Mode verwenden, Plan pruefen, dann umsetzen lassen.
 - [ ] Antworten erscheinen im Chat
 - [ ] Loading-Indikator waehrend der Verarbeitung
 - [ ] Fehler werden angezeigt (z.B. Backend nicht erreichbar)
+- [ ] Auto-Scroll zu neuen Nachrichten
+- [ ] Enter sendet, Shift+Enter fuer neue Zeile
 
 ---
 
-## 4. Integration testen
+## 4. Bonus: TracePanel (optional)
+
+> Dieses Feature ist **optional** und dient der Transparenz beim Debugging.
+
+Ein Debug-Panel das API-Requests, Tool-Calls und Timings anzeigt:
+- Toggle-Button in der Toolbar zum Ein-/Ausblenden
+- Zeigt pro Nachricht: Request/Response, Dauer, verwendetes Model
+- Spaeter (Tag 2): auch Tool-Call-Details und MCP-Interaktionen
+
+---
+
+## 5. start.sh — Orchestrierung
+
+Ein Start-Script das Backend und Frontend gemeinsam startet:
+
+### Anforderungen
+
+- API-Key als Argument oder aus `.env` lesen
+- `free_port`-Funktion: Port freigeben mit Polling bis Port tatsaechlich frei ist
+- Backend starten (`./mvnw spring-boot:run`), warten bis Port 8080 erreichbar
+- Frontend starten (`npm run dev`), warten bis Port 5173 erreichbar
+- Cleanup via `trap` bei SIGINT (Ctrl+C beendet alle Prozesse sauber)
+- Kein `set -e` (siehe Stolpersteine oben)
+
+---
+
+## 6. Integration testen
 
 Backend laeuft auf `:8080`, Frontend auf `:5173`.
+
+> **Hinweis:** Integration-Tests sind manuell — kein automatisiertes E2E-Framework noetig.
 
 **Test-Szenarien:**
 1. Einfache Frage stellen — LLM antwortet
