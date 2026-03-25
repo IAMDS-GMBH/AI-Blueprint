@@ -173,7 +173,8 @@ if [[ "$INSTALL_COPILOT" == true ]]; then
   copy_if_not_exists "$SCRIPT_DIR/.github/copilot-instructions.md" "$TARGET_DIR/.github/copilot-instructions.md"
   mkdir -p "$TARGET_DIR/.github/copilot-prompts"
   copy_if_not_exists "$SCRIPT_DIR/.github/copilot-prompts/configure.prompt.md" "$TARGET_DIR/.github/copilot-prompts/configure.prompt.md"
-  copy_if_not_exists "$SCRIPT_DIR/.vscode/mcp.json"  "$TARGET_DIR/.vscode/mcp.json"
+  copy_if_not_exists "$SCRIPT_DIR/.vscode/mcp.json"        "$TARGET_DIR/.vscode/mcp.json"
+  copy_if_not_exists "$SCRIPT_DIR/.vscode/extensions.json" "$TARGET_DIR/.vscode/extensions.json"
   echo ""
 fi
 
