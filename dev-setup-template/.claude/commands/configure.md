@@ -50,6 +50,13 @@ Zusaetzlich fragen: **Firmenname** und **Projektname** (falls nicht aus package.
   - `[PROJECT NAME]` → erkannter/abgefragter Projektname
   - `[STACK]` → z.B. "Java Spring Boot 3 + Vue.js 3 + PostgreSQL"
 - .mcp.json: MCP-Server vorschlagen basierend auf Stack
+- .claude/settings.json: **Plugins pruefen** — stack-spezifische Plugins aktivieren/deaktivieren:
+  - **Immer aktiv:** context7, commit-commands, superpowers, github, code-simplifier, ralph-loop, security-guidance, claude-md-management, memory, test-runner
+  - **Nur bei TypeScript/JS:** `typescript-lsp` — bei reinem Java/Python/C# deaktivieren
+  - **Nur bei Frontend:** `frontend-design`, `chrome-devtools-mcp` — bei reinem Backend deaktivieren
+  - **Nur bei Docker:** `docker` — ohne Docker/Containerisierung deaktivieren
+  - **Nur bei E2E-Tests:** `playwright` — ohne Playwright/E2E deaktivieren
+  - Deaktivieren = Key auf `false` setzen (nicht loeschen)
 
 ### Gemeinsam
 - MEMORY.md: Placeholders ersetzen + initiale Eintraege:
@@ -62,6 +69,7 @@ Zusaetzlich fragen: **Firmenname** und **Projektname** (falls nicht aus package.
 - Rules-Globs pruefen — matchen sie noch existierende Dateien?
 - Neue Dateien/Module erkennen die noch keine Rule haben
 - MCP-Server vorschlagen basierend auf Stack
+- **Plugins gegen Stack pruefen** — Stack hat sich geaendert? Plugins anpassen (siehe 2b)
 - Aenderungen als Vorschlag zeigen, User bestaetigt
 
 ## 4. Zusammenfassung
@@ -70,6 +78,8 @@ Zusaetzlich fragen: **Firmenname** und **Projektname** (falls nicht aus package.
 Konfiguration abgeschlossen:
 - Stack: [erkannter Stack]
 - Rules aktiviert: [Liste]
+- Plugins aktiv: [Liste aktiver Plugins]
+- Plugins deaktiviert: [Liste deaktivierter Plugins, falls welche]
 - Placeholders ersetzt in: CLAUDE.md, MEMORY.md
 
 Naechste Schritte:

@@ -32,6 +32,30 @@
 | review.md | Code Review vor PR-Merge |
 | docs.md | API-Docs, ADRs, Guides |
 
+## Plugins
+
+Aktive Claude Code Plugins (konfiguriert in `.claude/settings.json`):
+
+| Plugin | Zweck | Stack-abhaengig |
+|--------|-------|-----------------|
+| context7 | Aktuelle Doku fuer Libraries | Nein |
+| commit-commands | Git Commit Workflows | Nein |
+| superpowers | Erweiterte Faehigkeiten | Nein |
+| github | GitHub Integration | Nein |
+| code-simplifier | Code vereinfachen | Nein |
+| ralph-loop | Iterative Verbesserung | Nein |
+| security-guidance | Security Best Practices | Nein |
+| claude-md-management | CLAUDE.md Verwaltung | Nein |
+| memory | Persistentes Gedaechtnis | Nein |
+| test-runner | Tests ausfuehren | Nein |
+| typescript-lsp | TypeScript Analyse | Ja — nur bei TS/JS |
+| frontend-design | UI/UX Unterstuetzung | Ja — nur bei Frontend |
+| chrome-devtools-mcp | Browser DevTools | Ja — nur bei Frontend |
+| docker | Container Management | Ja — nur bei Docker |
+| playwright | E2E Browser-Tests | Ja — nur bei E2E |
+
+> Stack-abhaengige Plugins werden von `/configure` automatisch aktiviert/deaktiviert.
+
 ## Datei-Pflege
 
 | Datei | Wer |

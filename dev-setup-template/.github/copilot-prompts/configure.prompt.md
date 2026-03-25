@@ -41,6 +41,17 @@ Fragen: **Firmenname** und **Projektname**.
   - `[PROJECT NAME]` → Projektname
   - `[STACK]` → z.B. "Java Spring Boot 3 + Vue.js 3 + PostgreSQL"
 - .vscode/mcp.json: MCP-Server vorschlagen basierend auf Stack
+- .vscode/extensions.json: **Stack-spezifische Extensions** hinzufuegen:
+  - **Java:** `vscjava.vscode-java-pack`, `vmware.vscode-spring-boot`
+  - **Vue:** `Vue.volar`
+  - **React:** `dsznajder.es7-react-js-snippets`
+  - **Angular:** `angular.ng-template`
+  - **Python:** `ms-python.python`, `ms-python.pylint`
+  - **TypeScript/JS:** `dbaeumer.vscode-eslint` (bereits drin)
+  - **Docker:** `ms-azuretools.vscode-docker` (bereits drin)
+  - **PostgreSQL:** `ckolkman.vscode-postgres`
+  - Basis-Extensions (Copilot, Prettier, GitLens, etc.) bleiben immer drin
+  - Nicht-passende Stack-Extensions NICHT entfernen — nur fehlende hinzufuegen
 
 ### Gemeinsam
 - MEMORY.md: Placeholders ersetzen + initiale Eintraege (Tech-Stack, Projektstruktur)
@@ -50,6 +61,7 @@ Fragen: **Firmenname** und **Projektname**.
 - Instructions Globs pruefen — matchen sie existierende Dateien?
 - Neue Module erkennen die noch keine Instruction haben
 - MCP-Server vorschlagen
+- **Extensions gegen Stack pruefen** — fehlende Stack-Extensions nachinstallieren (siehe 2b)
 - Aenderungen als Vorschlag zeigen, User bestaetigt
 
 ## 4. Zusammenfassung
@@ -58,6 +70,7 @@ Fragen: **Firmenname** und **Projektname**.
 Konfiguration abgeschlossen:
 - Stack: [erkannter Stack]
 - Instructions aktiviert: [Liste]
+- VS Code Extensions: [Liste der Stack-Extensions in extensions.json]
 - Placeholders ersetzt in: copilot-instructions.md, MEMORY.md
 ```
 
